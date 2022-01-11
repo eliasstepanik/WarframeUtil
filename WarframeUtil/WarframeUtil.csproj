@@ -13,6 +13,7 @@
     <PackageReference Include="MudBlazor" Version="6.0.2" />
     <PackageReference Include="MudBlazor.Markdown" Version="0.0.6" />
     <PackageReference Include="MudBlazor.ThemeManager" Version="1.0.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="ServiceStack.Text" Version="5.13.2" />
   </ItemGroup>
 

@@ -1,0 +1,57 @@
+﻿@page "/Worldstate"
+@using WarframeUtil.Data
+@using Newtonsoft.Json
+@using System.Net
+
+<PageTitle>Worldstate</PageTitle>
+<h3>Worldstate</h3>
+
+<MudContainer Class="mt-6 px-4" MaxWidth="MaxWidth.False">
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;">
+                <h4 class="text-center">Challenges</h4>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;">
+                <h4 class="text-center">Void Fissures</h4>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="12" md="4">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;">
+                <h4 class="text-center">Sorties</h4>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+        <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;">
+            <h4 class="text-center">Relays</h4>
+        </MudPaper>
+        </MudItem>
+        <MudSpacer/>
+        <MudItem xs="12" sm="12" md="4">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;">
+                <h4 class="text-center">Bounties</h4>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+
+
+
+@code {
+    Root worldstate { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        worldstate = await GetWorldstate();
+    }
+    
+    
+    private async Task<Root> GetWorldstate()
+    {
+        var json = new WebClient().DownloadString("https://content.warframe.com/dynamic/worldState.php");
+        return JsonConvert.DeserializeObject<WarframeUtil.Data.Root>(json);
+    }
+}

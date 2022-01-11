@@ -6,14 +6,9 @@
 @using SimpleJSON
 
 <PageTitle>RivenTable</PageTitle>
+<h2>RivenTable</h2>
 
-<MudButton  Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.ArrowDownward" Style="background-color: yellowgreen; color: white; width: 200px; height: 60px;" @onclick=@(async () => await BlazorDownloadFileService.DownloadFileFromText("Export.csv", csv.Replace(',', ';'), System.Text.Encoding.UTF8, "text/csv"))>
-    Dowload as csv
-</MudButton>
-
-
-
-<MudTable Items="@weapons" Hover="true" SortLabel="Sort By" RowsPerPage="1000" FixedHeader="true" Height="800px">
+@*<MudTable Items="@weapons" Hover="true" SortLabel="Sort By" RowsPerPage="100" FixedHeader="true" Height="800px">
     <HeaderContent>
         <MudTh><MudTableSortLabel SortBy="new Func<Riven, object>(x=>x.Name)">Name</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel Enabled="@enabled" SortBy="new Func<Riven, object>(x=>x.Count)">Trade Chat (5 days)</MudTableSortLabel></MudTh>
@@ -37,11 +32,9 @@
     <PagerContent>
         <MudTablePager PageSizeOptions="new int[]{50, 100, 200}" />
     </PagerContent>
-</MudTable>
+</MudTable>*@
 
-
-@*
-<BlazorTable.Table TableItem="Riven" Items="weapons" PageSize="500">
+<BlazorTable.Table TableItem="Riven" Items="weapons" PageSize="50" >
     <BlazorTable.Column TableItem="Riven" Title="Weapon Name" Field="@(x => x.Name)" Sortable="true" Filterable="true" Width="10%" />
     <BlazorTable.Column TableItem="Riven" Title="Trade Chat (5 days)" Field="@(x => x.Count)" Sortable="true" Filterable="true" Width="10%" />
     <BlazorTable.Column TableItem="Riven" Title="PriceAvg" Field="@(x => x.PriceAvg)" Sortable="true" Filterable="true" Width="10%" />
@@ -52,7 +45,10 @@
     <BlazorTable.Column TableItem="Riven" Title="UnfilteredPriceMax" Field="@(x => x.UnfilteredPriceMax)" Sortable="true" Filterable="true" Width="10%" />
     <BlazorTable.Pager ShowPageNumber="true" ShowTotalCount="true" />
 </BlazorTable.Table>
-*@
+
+<MudButton  Variant="MudBlazor.Variant.Filled" EndIcon="@Icons.Material.Filled.ArrowDownward" Style="background-color: yellowgreen; color: white; width: 200px; height: 60px;" @onclick=@(async () => await BlazorDownloadFileService.DownloadFileFromText("Export.csv", csv.Replace(',', ';'), System.Text.Encoding.UTF8, "text/csv"))>
+    Dowload as csv
+</MudButton>
 
 
 
