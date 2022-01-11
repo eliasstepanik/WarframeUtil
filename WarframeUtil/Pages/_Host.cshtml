@@ -4,5 +4,15 @@
 @{
     Layout = "_Layout";
 }
+<div id="components-reconnect-modal"></div>
 
-<component type="typeof(App)" render-mode="ServerPrerendered" />
+<style>
+    .components-reconnect-show, .components-reconnect-failed, .components-reconnect-rejected {
+         display: none;
+    }
+</style>
+
+<app>
+    @(await Html.RenderComponentAsync<App>(RenderMode.ServerPrerendered))
+</app>
+

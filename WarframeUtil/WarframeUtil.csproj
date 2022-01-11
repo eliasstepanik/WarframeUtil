@@ -4,10 +4,16 @@
 	  <TargetFramework>net6.0</TargetFramework>
 	  <Nullable>enable</Nullable>
 	  <ImplicitUsings>enable</ImplicitUsings>
+	  <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BlazorDownloadFile" Version="2.3.1" />
+    <PackageReference Include="BlazorTable" Version="1.17.0" />
     <PackageReference Include="MudBlazor" Version="6.0.2" />
+    <PackageReference Include="MudBlazor.Markdown" Version="0.0.6" />
+    <PackageReference Include="MudBlazor.ThemeManager" Version="1.0.5" />
+    <PackageReference Include="ServiceStack.Text" Version="5.13.2" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,7 @@
-﻿@inherits LayoutComponentBase
+﻿@using MudBlazor.Utilities
+@inherits LayoutComponentBase
 
-<MudThemeProvider />
+<MudThemeProvider Theme="_theme"/> @*@bind-IsDarkMode="_isDarkMode"*@
 <MudDialogProvider />
 <MudSnackbarProvider />
 
@@ -8,8 +9,8 @@
     <MudAppBar Elevation="0">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudSpacer />
-        <MudIconButton Icon="@Icons.Custom.Brands.MudBlazor" Color="Color.Inherit" Link="https://mudblazor.com/" Target="_blank" />
-        <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Link="https://github.com/Garderoben/MudBlazor" Target="_blank" />
+        <MudSwitch Color="Color.Primary" Class="ma-4" T="bool" CheckedChanged="DarkMode" Label="Toggle Light/Dark Mode"/>
+        <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Link="https://github.com/eliasstepanik/WarframeWebsite" Target="_blank" />
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
         <MudDrawerHeader>
@@ -18,7 +19,7 @@
         <NavMenu />
     </MudDrawer>
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.Large" Class="my-16 pt-16">
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="my-4 pt-2">
             @Body
         </MudContainer>
     </MudMainContent>
@@ -26,9 +27,28 @@
 
 @code {
     bool _drawerOpen = true;
+    private MudTheme _theme = new();
+    private bool _isDarkMode;
+
 
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+    
+    void DarkMode(bool value)
+    {
+        _theme = !value ? new MudTheme() : new MudTheme
+        {
+            Palette = new Palette()
+            {
+                Black = "#27282f",
+                Background = "#32343d",
+                BackgroundGrey = "#27282f",
+                Surface = "#373840",
+                TextPrimary = "#ffffffb2",
+                TextSecondary = "rgba(255,255,255, 0.50)"
+            }
+        };;
     }
 }

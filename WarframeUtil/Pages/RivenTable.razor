@@ -1,6 +1,126 @@
 ﻿@page "/RivenTable"
-<h3>RivenTable</h3>
+@using WarframeUtil.Data
+@using System.Net
+@using BlazorDownloadFile
+@using ServiceStack
+@using SimpleJSON
 
-@code {
+<PageTitle>RivenTable</PageTitle>
+
+<MudButton  Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.ArrowDownward" Style="background-color: yellowgreen; color: white; width: 200px; height: 60px;" @onclick=@(async () => await BlazorDownloadFileService.DownloadFileFromText("Export.csv", csv.Replace(',', ';'), System.Text.Encoding.UTF8, "text/csv"))>
+    Dowload as csv
+</MudButton>
+
+
+
+<MudTable Items="@weapons" Hover="true" SortLabel="Sort By" RowsPerPage="1000" FixedHeader="true" Height="800px">
+    <HeaderContent>
+        <MudTh><MudTableSortLabel SortBy="new Func<Riven, object>(x=>x.Name)">Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel Enabled="@enabled" SortBy="new Func<Riven, object>(x=>x.Count)">Trade Chat (5 days)</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Riven, object>(x=>x.PriceAvg)">PriceAvg</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Riven, object>(x=>x.PriceMin)">PriceMin</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Riven, object>(x=>x.PriceMax)">PriceMax</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Riven, object>(x=>x.UnfilteredPriceAvg)">UnfilteredPriceAvg</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Riven, object>(x=>x.UnfilteredPriceMin)">UnfilteredPriceMin</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Riven, object>(x=>x.UnfilteredPriceMax)">UnfilteredPriceMax</MudTableSortLabel></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Trade Chat (5 days)">@context.Count</MudTd>
+        <MudTd DataLabel="PriceAvg">@context.PriceAvg</MudTd>
+        <MudTd DataLabel="PriceMin">@context.PriceMin</MudTd>
+        <MudTd DataLabel="PriceMax">@context.PriceMax</MudTd>
+        <MudTd DataLabel="UnfilteredPriceAvg">@context.UnfilteredPriceAvg</MudTd>
+        <MudTd DataLabel="UnfilteredPriceMin">@context.UnfilteredPriceMin</MudTd>
+        <MudTd DataLabel="UnfilteredPriceMax">@context.UnfilteredPriceMax</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[]{50, 100, 200}" />
+    </PagerContent>
+</MudTable>
+
+
+@*
+<BlazorTable.Table TableItem="Riven" Items="weapons" PageSize="500">
+    <BlazorTable.Column TableItem="Riven" Title="Weapon Name" Field="@(x => x.Name)" Sortable="true" Filterable="true" Width="10%" />
+    <BlazorTable.Column TableItem="Riven" Title="Trade Chat (5 days)" Field="@(x => x.Count)" Sortable="true" Filterable="true" Width="10%" />
+    <BlazorTable.Column TableItem="Riven" Title="PriceAvg" Field="@(x => x.PriceAvg)" Sortable="true" Filterable="true" Width="10%" />
+    <BlazorTable.Column TableItem="Riven" Title="PriceMin" Field="@(x => x.PriceMin)" Sortable="true" Filterable="true" Width="10%" />
+    <BlazorTable.Column TableItem="Riven" Title="PriceMax" Field="@(x => x.PriceMax)" Sortable="true" Filterable="true" Width="10%" />
+    <BlazorTable.Column TableItem="Riven" Title="UnfilteredPriceAvg" Field="@(x => x.UnfilteredPriceAvg)" Sortable="true" Filterable="true" Width="10%" />
+    <BlazorTable.Column TableItem="Riven" Title="UnfilteredPriceMin" Field="@(x => x.UnfilteredPriceMin)" Sortable="true" Filterable="true" Width="10%" />
+    <BlazorTable.Column TableItem="Riven" Title="UnfilteredPriceMax" Field="@(x => x.UnfilteredPriceMax)" Sortable="true" Filterable="true" Width="10%" />
+    <BlazorTable.Pager ShowPageNumber="true" ShowTotalCount="true" />
+</BlazorTable.Table>
+*@
+
+
+
+@code{
+    [Inject] IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
     
+    private bool enabled = true;
+    
+    public bool Ignore2K { get; set; }
+    public string url = "https://10o.io/pricehistory.json?v2";
+    public List<Riven> weapons { get; set; }
+
+    public string csv { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        weapons = new List<Riven>();
+        
+        FilterJson(GetData());
+
+    }
+
+    public void FilterJson(string jsonContent)
+    {
+        JSONNode json = JSONNode.Parse(jsonContent);
+        Dictionary<string, object[]> weaponsDictionary = new Dictionary<string, object[]>();
+
+        foreach (JSONNode weapon in json)
+        {
+            List<int> prices = new List<int>();
+            List<int> sub2K = new List<int>();
+            foreach(JSONNode data in weapon)
+            {
+                foreach(JSONNode riven in data)
+                {
+                    prices.Add(int.Parse(riven["price"]));
+                    if (int.Parse(riven["price"]) <= 2000)
+                    {
+                        sub2K.Add(int.Parse(riven["price"]));
+                    }
+                }
+            }
+
+            object[] dataPoints = new object[] { weapon["data"].Count, Math.Round(sub2K.Average()), sub2K.Min(), sub2K.Max(), Math.Round(prices.Average()), prices.Min(), prices.Max()};
+            weaponsDictionary.Add(weapon["name"].ToString().Trim('\"'), dataPoints);
+        }
+
+        foreach (var item in weaponsDictionary)
+        {
+            Riven weapon = new Riven()
+            {
+                Name = item.Key,
+                Count = (int) item.Value[0],
+                PriceMin = (int) item.Value[2],
+                PriceMax = (int) item.Value[3],
+                PriceAvg = (double) item.Value[1],
+                UnfilteredPriceMin = (int) item.Value[5],
+                UnfilteredPriceMax = (int) item.Value[6],
+                UnfilteredPriceAvg = (double) item.Value[4],
+            };
+            weapons.Add(weapon);
+        }
+        csv = weapons.ToCsv();
+    }
+    
+    public string GetData()
+    {
+        return new WebClient().DownloadString("https://10o.io/pricehistory.json?v2");
+    }
+
 }
