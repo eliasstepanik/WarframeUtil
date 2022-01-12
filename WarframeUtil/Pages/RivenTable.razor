@@ -34,16 +34,38 @@
     </PagerContent>
 </MudTable>*@
 
-<BlazorTable.Table TableItem="Riven" Items="weapons" PageSize="50" >
-    <BlazorTable.Column TableItem="Riven" Title="Weapon Name" Field="@(x => x.Name)" Sortable="true" Filterable="true" Width="10%" />
-    <BlazorTable.Column TableItem="Riven" Title="Trade Chat (5 days)" Field="@(x => x.Count)" Sortable="true" Filterable="true" Width="10%" />
-    <BlazorTable.Column TableItem="Riven" Title="PriceAvg" Field="@(x => x.PriceAvg)" Sortable="true" Filterable="true" Width="10%" />
-    <BlazorTable.Column TableItem="Riven" Title="PriceMin" Field="@(x => x.PriceMin)" Sortable="true" Filterable="true" Width="10%" />
-    <BlazorTable.Column TableItem="Riven" Title="PriceMax" Field="@(x => x.PriceMax)" Sortable="true" Filterable="true" Width="10%" />
-    <BlazorTable.Column TableItem="Riven" Title="UnfilteredPriceAvg" Field="@(x => x.UnfilteredPriceAvg)" Sortable="true" Filterable="true" Width="10%" />
-    <BlazorTable.Column TableItem="Riven" Title="UnfilteredPriceMin" Field="@(x => x.UnfilteredPriceMin)" Sortable="true" Filterable="true" Width="10%" />
-    <BlazorTable.Column TableItem="Riven" Title="UnfilteredPriceMax" Field="@(x => x.UnfilteredPriceMax)" Sortable="true" Filterable="true" Width="10%" />
-    <BlazorTable.Pager ShowPageNumber="true" ShowTotalCount="true" />
+<BlazorTable.Table TableItem="Riven" Items="weapons" PageSize="50">
+    <BlazorTable.LoadingDataTemplate>
+        Loading...
+    </BlazorTable.LoadingDataTemplate>
+    <BlazorTable.Column TableItem="Riven" Title="Weapon Name" Field="@(x => x.Name)" Sortable="true" Filterable="true" Width="10%"/>
+    <BlazorTable.Column TableItem="Riven" Title="Trade Chat (5 days)" Field="@(x => x.Count)" Sortable="true" Filterable="true" Width="10%"/>
+    <BlazorTable.Column TableItem="Riven" Title="UnrolledAvg" Field="@(x => x.AverageUnrolled)" Sortable="true" Filterable="true" Width="10%"/>
+    <BlazorTable.Column TableItem="Riven" Title="PriceAvg" Field="@(x => x.PriceAvg)" Sortable="true" Filterable="true" Width="10%"/>
+    <BlazorTable.Column TableItem="Riven" Title="PriceMin" Field="@(x => x.PriceMin)" Sortable="true" Filterable="true" Width="10%"/>
+    <BlazorTable.Column TableItem="Riven" Title="PriceMax" Field="@(x => x.PriceMax)" Sortable="true" Filterable="true" Width="10%"/>
+    <BlazorTable.Column TableItem="Riven" Title="UnfilteredPriceAvg" Field="@(x => x.UnfilteredPriceAvg)" Sortable="true" Filterable="true" Width="10%"/>
+    <BlazorTable.Column TableItem="Riven" Title="UnfilteredPriceMin" Field="@(x => x.UnfilteredPriceMin)" Sortable="true" Filterable="true" Width="10%"/>
+    <BlazorTable.Column TableItem="Riven" Title="UnfilteredPriceMax" Field="@(x => x.UnfilteredPriceMax)" Sortable="true" Filterable="true" Width="10%"/>
+    <BlazorTable.DetailTemplate TableItem="Riven" Context="weapons">
+        <div style="color:green">
+            Top 5 Buffs(by popularity): <br/>
+            @(weapons.RivenStats.Buffs[0].Name)<br/>
+            @(weapons.RivenStats.Buffs[1].Name)<br/>
+            @(weapons.RivenStats.Buffs[2].Name)<br/>
+            @(weapons.RivenStats.Buffs[3].Name)<br/>
+            @(weapons.RivenStats.Buffs[4].Name)<br/>
+        </div>
+        <div style="color:#990000">
+            Top 5 Curses(by popularity): <br/>
+            @(weapons.RivenStats.Curses[0].Name)<br/>
+            @(weapons.RivenStats.Curses[1].Name)<br/>
+            @(weapons.RivenStats.Curses[2].Name)<br/>
+            @(weapons.RivenStats.Curses[3].Name)<br/>
+            @(weapons.RivenStats.Curses[4].Name)<br/>
+        </div>
+    </BlazorTable.DetailTemplate>
+    <BlazorTable.Pager ShowPageNumber="true" ShowTotalCount="true"/>
 </BlazorTable.Table>
 
 <MudButton  Variant="MudBlazor.Variant.Filled" EndIcon="@Icons.Material.Filled.ArrowDownward" Style="background-color: yellowgreen; color: white; width: 200px; height: 60px;" @onclick=@(async () => await BlazorDownloadFileService.DownloadFileFromText("Export.csv", csv.Replace(',', ';'), System.Text.Encoding.UTF8, "text/csv"))>
@@ -57,59 +79,112 @@
     
     private bool enabled = true;
     
-    public bool Ignore2K { get; set; }
     public string url = "https://10o.io/pricehistory.json?v2";
     public List<Riven> weapons { get; set; }
 
     public string csv { get; set; }
+    public List<int> unrolledPrices = new List<int>();
 
     protected override async Task OnInitializedAsync()
     {
         weapons = new List<Riven>();
         
         FilterJson(GetData());
-
+        
     }
 
     public void FilterJson(string jsonContent)
     {
         JSONNode json = JSONNode.Parse(jsonContent);
-        Dictionary<string, object[]> weaponsDictionary = new Dictionary<string, object[]>();
 
         foreach (JSONNode weapon in json)
         {
             List<int> prices = new List<int>();
             List<int> sub2K = new List<int>();
+            Dictionary<string, int> buffDict = new Dictionary<string, int>();
+            Dictionary<string, int> curseDict = new Dictionary<string, int>();
             foreach(JSONNode data in weapon)
             {
                 foreach(JSONNode riven in data)
                 {
+                    if (riven["rolls"] == 0)
+                    {
+                        unrolledPrices.Add(int.Parse(riven["price"])); 
+                    }
                     prices.Add(int.Parse(riven["price"]));
                     if (int.Parse(riven["price"]) <= 2000)
                     {
                         sub2K.Add(int.Parse(riven["price"]));
                     }
+
+                    foreach (JSONNode buff in riven["buffs"])
+                    {
+                        String name = buff["tag"].ToString().Remove(0, 8).Trim('\"');
+                        if (buff["curse"])
+                        {
+                            if (curseDict.ContainsKey(name))
+                            {
+                                curseDict[name]++;
+                            }
+                            else
+                            {
+                                curseDict.Add(name, 1);
+                            }
+                        }
+                        else
+                        {
+                            if (buffDict.ContainsKey(name))
+                            {
+                                buffDict[name]++;
+                            }
+                            else
+                            {
+                                buffDict.Add(name, 1);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            RivenStats rivenStats = new RivenStats();
+            //sort lists
+            foreach (KeyValuePair<string, int> item in buffDict.OrderByDescending(key => key.Value))
+            {
+                rivenStats.Buffs.Add(new Buff(item.Key, item.Value));
+            }
+            foreach (KeyValuePair<string, int> item in curseDict.OrderByDescending(key => key.Value))
+            {
+                rivenStats.Curses.Add(new Curse(item.Key, item.Value));
+            }
+            if (rivenStats.Buffs.Count < 5)
+            {
+                for (int sub5 = rivenStats.Buffs.Count; sub5 < 6; sub5++)
+                {
+                    rivenStats.Buffs.Add(new Buff(" ", 0));
+                }
+            }
+            if (rivenStats.Curses.Count < 5)
+            {
+                for (int sub5 = rivenStats.Curses.Count; sub5 < 6; sub5++)
+                {
+                    rivenStats.Curses.Add(new Curse("", 0));
                 }
             }
 
-            object[] dataPoints = new object[] { weapon["data"].Count, Math.Round(sub2K.Average()), sub2K.Min(), sub2K.Max(), Math.Round(prices.Average()), prices.Min(), prices.Max()};
-            weaponsDictionary.Add(weapon["name"].ToString().Trim('\"'), dataPoints);
-        }
-
-        foreach (var item in weaponsDictionary)
-        {
-            Riven weapon = new Riven()
+            Riven currentWeapon = new Riven()
             {
-                Name = item.Key,
-                Count = (int) item.Value[0],
-                PriceMin = (int) item.Value[2],
-                PriceMax = (int) item.Value[3],
-                PriceAvg = (double) item.Value[1],
-                UnfilteredPriceMin = (int) item.Value[5],
-                UnfilteredPriceMax = (int) item.Value[6],
-                UnfilteredPriceAvg = (double) item.Value[4],
+                Name = weapon["name"].ToString().Trim('\"'),
+                Count = (int) weapon["data"].Count,
+                PriceMin = (int) sub2K.Min(),
+                PriceMax = (int) sub2K.Max(),
+                PriceAvg = (double) Math.Round(sub2K.Average()),
+                UnfilteredPriceMin = (int) prices.Min(),
+                UnfilteredPriceMax = (int) prices.Max(),
+                UnfilteredPriceAvg = (double) Math.Round(prices.Average()),
+                RivenStats = rivenStats,
+                AverageUnrolled = Math.Round(unrolledPrices.Average())
             };
-            weapons.Add(weapon);
+            weapons.Add(currentWeapon);
         }
         csv = weapons.ToCsv();
     }
