@@ -2,8 +2,10 @@
 @using WarframeUtil.Data
 @using System.Net
 @using BlazorDownloadFile
+@using BlazorTable
 @using ServiceStack
 @using SimpleJSON
+@inject Data.GVState GVState;
 
 <PageTitle>RivenTable</PageTitle>
 <h2>RivenTable</h2>
@@ -33,8 +35,7 @@
         <MudTablePager PageSizeOptions="new int[]{50, 100, 200}" />
     </PagerContent>
 </MudTable>*@
-
-<BlazorTable.Table TableItem="Riven" Items="weapons" PageSize="50" >
+<BlazorTable.Table TableItem="Riven" Items="weapons" PageSize="50" style='@(GVState.IsDarkMode.Equals(true) ? "color: #dae0e5" : "")'>
     <BlazorTable.LoadingDataTemplate>
         Loading...
     </BlazorTable.LoadingDataTemplate>
@@ -68,6 +69,7 @@
     <BlazorTable.Pager ShowPageNumber="true" ShowTotalCount="true"/>
 </BlazorTable.Table>
 
+
 <MudButton  Variant="MudBlazor.Variant.Filled" EndIcon="@Icons.Material.Filled.ArrowDownward" Style="background-color: yellowgreen; color: white; width: 200px; height: 60px;" @onclick=@(async () => await BlazorDownloadFileService.DownloadFileFromText("Export.csv", csv.Replace(',', ';'), System.Text.Encoding.UTF8, "text/csv"))>
     Dowload as csv
 </MudButton>
@@ -76,9 +78,9 @@
 
 @code{
     [Inject] IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
-    
+
     private bool enabled = true;
-    
+
     public string url = "https://10o.io/pricehistory.json?v2";
     public List<Riven> weapons { get; set; }
 
@@ -214,6 +216,16 @@
     public string GetData()
     {
         return new WebClient().DownloadString("https://10o.io/pricehistory.json?v2");
+    }
+    
+    protected override void OnInitialized()
+    {
+        GVState.OnChange += StateHasChanged;
+
+    }
+    public void Dispose()
+    {
+        GVState.OnChange -= StateHasChanged;
     }
 
 }

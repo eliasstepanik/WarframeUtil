@@ -14,6 +14,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
 builder.Services.AddBlazorTable();
 builder.Services.AddBlazorDownloadFile(ServiceLifetime.Scoped);
+builder.Services.AddScoped<GVState>();
 
 var app = builder.Build();
 

@@ -1,5 +1,7 @@
 ﻿@using MudBlazor.Utilities
 @inherits LayoutComponentBase
+@inject WarframeUtil.Data.GVState _gvState;
+@implements IDisposable
 
 <MudThemeProvider Theme="_theme"/> @*@bind-IsDarkMode="_isDarkMode"*@
 <MudDialogProvider />
@@ -9,17 +11,14 @@
     <MudAppBar Elevation="0">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudSpacer />
-        <MudSwitch Color="Color.Primary" Class="ma-4" T="bool" CheckedChanged="DarkMode" Label="Toggle Light/Dark Mode"/>
+        <MudSwitch Color="Color.Primary" Class="ma-4" T="bool" CheckedChanged="DarkMode" Label="Toggle Light/Dark Mode" />
         <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Link="https://github.com/eliasstepanik/WarframeUtil" Target="_blank" />
     </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
-        <MudDrawerHeader>
-            <MudText Typo="Typo.h6">WarframeUtil</MudText>
-        </MudDrawerHeader>
-        <NavMenu />
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="1" Class="@(_gvState.IsDarkMode.Equals(true) ? "bg-dark" : "")">
+        <NavMenu/>
     </MudDrawer>
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="my-4 pt-2">
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="my-4 pt-2 b">
             @Body
         </MudContainer>
     </MudMainContent>
@@ -28,7 +27,6 @@
 @code {
     bool _drawerOpen = true;
     private MudTheme _theme = new();
-    private bool _isDarkMode;
 
 
     void DrawerToggle()
@@ -38,6 +36,7 @@
     
     void DarkMode(bool value)
     {
+        _gvState.SetDarkMode(value);
         _theme = !value ? new MudTheme() : new MudTheme
         {
             Palette = new Palette()
@@ -50,5 +49,14 @@
                 TextSecondary = "rgba(255,255,255, 0.50)"
             }
         };;
+    }
+    
+    protected override void OnInitialized()
+    {
+        _gvState.OnChange += StateHasChanged;
+    }
+    public void Dispose()
+    {
+        _gvState.OnChange -= StateHasChanged;
     }
 }

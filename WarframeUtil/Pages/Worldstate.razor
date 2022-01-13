@@ -2,6 +2,8 @@
 @using WarframeUtil.Data
 @using Newtonsoft.Json
 @using System.Net
+@implements IDisposable
+@using System.Timers
 
 <PageTitle>Worldstate</PageTitle>
 <h3>Worldstate</h3>
@@ -14,8 +16,9 @@
             </MudPaper>
         </MudItem>
         <MudItem xs="12" sm="6" md="4">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 100%;">
                 <h4 class="text-center">Void Fissures</h4>
+                
             </MudPaper>
         </MudItem>
         <MudItem xs="12" sm="12" md="4">
@@ -24,9 +27,9 @@
             </MudPaper>
         </MudItem>
         <MudItem xs="12" sm="6" md="4">
-        <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;">
-            <h4 class="text-center">Relays</h4>
-        </MudPaper>
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;">
+                <h4 class="text-center">Relays</h4>
+            </MudPaper>
         </MudItem>
         <MudSpacer/>
         <MudItem xs="12" sm="12" md="4">
@@ -42,16 +45,51 @@
 
 @code {
     Root worldstate { get; set; }
+    private Timer timer;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            timer = new Timer();
+            timer.Interval = 30000;
+            timer.Elapsed += OnTimerInterval;
+            timer.AutoReset = true;
+    // Start the timer
+            timer.Enabled = true;
+        }
+        base.OnAfterRender(firstRender);
+    }
+    
+    private void OnTimerInterval(object sender, ElapsedEventArgs e)
+    {
+        IncrementCount();
+        InvokeAsync(() => StateHasChanged());
+    }
+    
+    public void Dispose()
+    {
+    // During prerender, this component is rendered without calling OnAfterRender and then immediately disposed
+    // this mean timer will be null so we have to check for null or use the Null-conditional operator ? 
+        timer?.Dispose();
+    }
+    
+    
+    
     
     protected override async Task OnInitializedAsync()
     {
         worldstate = await GetWorldstate();
     }
     
-    
     private async Task<Root> GetWorldstate()
     {
         var json = new WebClient().DownloadString("https://content.warframe.com/dynamic/worldState.php");
         return JsonConvert.DeserializeObject<WarframeUtil.Data.Root>(json);
+    }
+    
+    private async Task IncrementCount()
+    {
+        worldstate = await GetWorldstate();
     }
 }
