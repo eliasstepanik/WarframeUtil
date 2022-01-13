@@ -34,7 +34,7 @@
     </PagerContent>
 </MudTable>*@
 
-<BlazorTable.Table TableItem="Riven" Items="weapons" PageSize="50">
+<BlazorTable.Table TableItem="Riven" Items="weapons" PageSize="50" >
     <BlazorTable.LoadingDataTemplate>
         Loading...
     </BlazorTable.LoadingDataTemplate>
@@ -83,14 +83,11 @@
     public List<Riven> weapons { get; set; }
 
     public string csv { get; set; }
-    public List<int> unrolledPrices = new List<int>();
 
     protected override async Task OnInitializedAsync()
     {
         weapons = new List<Riven>();
-        
         FilterJson(GetData());
-        
     }
 
     public void FilterJson(string jsonContent)
@@ -100,7 +97,7 @@
         foreach (JSONNode weapon in json)
         {
             List<int> prices = new List<int>();
-            List<int> sub2K = new List<int>();
+            List<int> unrolledPrices = new List<int>();
             Dictionary<string, int> buffDict = new Dictionary<string, int>();
             Dictionary<string, int> curseDict = new Dictionary<string, int>();
             foreach(JSONNode data in weapon)
@@ -112,13 +109,9 @@
                         unrolledPrices.Add(int.Parse(riven["price"])); 
                     }
                     prices.Add(int.Parse(riven["price"]));
-                    if (int.Parse(riven["price"]) <= 2000)
-                    {
-                        sub2K.Add(int.Parse(riven["price"]));
-                    }
 
                     foreach (JSONNode buff in riven["buffs"])
-                    {
+                    {//keep track of buffs/curses per weapon
                         String name = buff["tag"].ToString().Remove(0, 8).Trim('\"');
                         if (buff["curse"])
                         {
@@ -147,7 +140,7 @@
             }
             
             RivenStats rivenStats = new RivenStats();
-            //sort lists
+            //sort lists by count
             foreach (KeyValuePair<string, int> item in buffDict.OrderByDescending(key => key.Value))
             {
                 rivenStats.Buffs.Add(new Buff(item.Key, item.Value));
@@ -156,7 +149,9 @@
             {
                 rivenStats.Curses.Add(new Curse(item.Key, item.Value));
             }
-            if (rivenStats.Buffs.Count < 5)
+            
+            
+            if (rivenStats.Buffs.Count < 5)//fill list past 5 to avoid nullpointer
             {
                 for (int sub5 = rivenStats.Buffs.Count; sub5 < 6; sub5++)
                 {
@@ -170,19 +165,46 @@
                     rivenStats.Curses.Add(new Curse("", 0));
                 }
             }
-
+            
+            List<int> filteredUnrolledPrices = new List<int>();
+            foreach (int item in unrolledPrices)//filter unreasonably high prices on unrolled rivens
+            {
+                if (item < (int) Math.Round(unrolledPrices.Average() * 0.75))
+                {
+                    filteredUnrolledPrices.Add(item);
+                }
+            }
+            if (filteredUnrolledPrices.Count == 0)
+            {
+                filteredUnrolledPrices.Add(1);
+            }
+            
+            List<int> filteredTotalPrices = new List<int>();
+            foreach (int item in prices)//filter unreasonably high prices on all rivens
+            {
+                if (item < (int) Math.Round(prices.Average() * 0.87))
+                {
+                    filteredTotalPrices.Add(item);
+                }
+            }
+            if (filteredTotalPrices.Count == 0)
+            {
+                filteredTotalPrices.Add(1);
+            }
+            
+            
             Riven currentWeapon = new Riven()
             {
                 Name = weapon["name"].ToString().Trim('\"'),
                 Count = (int) weapon["data"].Count,
-                PriceMin = (int) sub2K.Min(),
-                PriceMax = (int) sub2K.Max(),
-                PriceAvg = (double) Math.Round(sub2K.Average()),
+                PriceMin = (int) filteredTotalPrices.Min(),
+                PriceMax = (int) filteredTotalPrices.Max(),
+                PriceAvg = (double) Math.Round(filteredTotalPrices.Average()),
                 UnfilteredPriceMin = (int) prices.Min(),
                 UnfilteredPriceMax = (int) prices.Max(),
                 UnfilteredPriceAvg = (double) Math.Round(prices.Average()),
                 RivenStats = rivenStats,
-                AverageUnrolled = Math.Round(unrolledPrices.Average())
+                AverageUnrolled = Math.Round(filteredUnrolledPrices.Average())
             };
             weapons.Add(currentWeapon);
         }
