@@ -1,10 +1,14 @@
-﻿
+﻿@inject WarframeUtil.Data.GVState _gvState;
+@using WarframeUtil.Data
 
-<MudDrawerHeader Style="border-bottom: black;">
-    <MudText Typo="Typo.h6">WarframeUtil</MudText>
-</MudDrawerHeader>
-<MudNavMenu>
-    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-    <MudNavLink Href="/RivenTable" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Riven Table (5 days)</MudNavLink>
-    <MudNavLink Href="/Worldstate" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Satellite" >Worldstate</MudNavLink>
-</MudNavMenu>
+<div Style="background: #222222" class="text-light">
+    <MudDrawerHeader Style="border-bottom: black;">
+        <MudText Typo="Typo.h6">WarframeUtil</MudText>
+    </MudDrawerHeader>
+    <MudNavMenu>
+        <MudNavLink Href="" Match="NavLinkMatch.All" Icon="Color.Success">Home</MudNavLink>
+        <MudNavLink Href="/RivenTable" Match="NavLinkMatch.Prefix" Icon="Color.Success">Riven Table (5 days)</MudNavLink>
+        <MudNavLink Href="/Worldstate" Match="NavLinkMatch.Prefix" Icon="Color.Success" >Worldstate</MudNavLink>
+    </MudNavMenu>
+</div>
+

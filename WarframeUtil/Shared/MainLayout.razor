@@ -5,13 +5,13 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<MudLayout>
+<MudLayout class="text-light">
     <MudAppBar Elevation="0">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudSpacer />
         <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Link="https://github.com/eliasstepanik/WarframeUtil" Target="_blank" />
     </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="1" Style="background: #222222">
         <NavMenu/>
     </MudDrawer>
     <MudMainContent>
@@ -29,6 +29,17 @@
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+    
+    
+    protected override void OnInitialized()
+    {
+        _theme.Palette = new Palette()
+        {
+            AppbarBackground = new MudColor(34, 34, 34, 255),
+            Background = new MudColor(24, 24, 24, 255),
+            
+        };
     }
 
 }
