@@ -51,7 +51,20 @@
                 </RadzenCard>
             </div>
             <div >
-                @*<LineChart Value="riven"/>*@
+                @*<RadzenChart>
+                    <RadzenLineSeries Data="@weapons" CategoryProperty="" Title="PriceAvg" ValueProperty="PriceAvg" RenderingOrder="1">
+                        <RadzenMarkers MarkerType="MarkerType.Circle" />
+                    </RadzenLineSeries>
+                    <RadzenLineSeries Data="@weapons" CategoryProperty="" Title="UnrolledAvg" ValueProperty="AverageUnrolled" RenderingOrder="2">
+                        <RadzenMarkers MarkerType="MarkerType.Circle" />
+                    </RadzenLineSeries>
+                    <RadzenCategoryAxis Padding="20" FormatString="{0:MMM}" />
+                    <RadzenValueAxis Formatter="@FormatDate">
+                        <RadzenGridLines Visible="true" />
+                        <RadzenAxisTitle Text="Price in p" />
+                    </RadzenValueAxis>
+                </RadzenChart>*@
+                <LineChart Value="riven"/>
             </div>
         </div>
     </Template>
@@ -79,6 +92,11 @@
     public List<Riven> weapons { get; set; }
 
     public string csv { get; set; }
+    
+    string FormatDate(object value)
+    {
+        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -196,6 +214,14 @@
             {
                 filteredTotalPrices.Add(1);
             }
+
+
+            List<Price> pricesPrice = new List<Price>();
+            
+            foreach (var item in prices)
+            {
+                pricesPrice.Add(new Price(item));
+            }
             
             
             Riven currentWeapon = new Riven()
@@ -209,7 +235,8 @@
                 UnfilteredPriceMax = (int) prices.Max(),
                 UnfilteredPriceAvg = (double) Math.Round(prices.Average()),
                 RivenStats = rivenStats,
-                AverageUnrolled = Math.Round(filteredUnrolledPrices.Average())
+                AverageUnrolled = Math.Round(filteredUnrolledPrices.Average()),
+                Prices = pricesPrice
             };
             weapons.Add(currentWeapon);
         }
