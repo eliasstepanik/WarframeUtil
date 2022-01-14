@@ -10,32 +10,7 @@
 <PageTitle>RivenTable</PageTitle>
 <h2>RivenTable</h2>
 
-@*<MudTable Items="@weapons" Hover="true" SortLabel="Sort By" RowsPerPage="100" FixedHeader="true" Height="800px">
-    <HeaderContent>
-        <MudTh><MudTableSortLabel SortBy="new Func<Riven, object>(x=>x.Name)">Name</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel Enabled="@enabled" SortBy="new Func<Riven, object>(x=>x.Count)">Trade Chat (5 days)</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Riven, object>(x=>x.PriceAvg)">PriceAvg</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Riven, object>(x=>x.PriceMin)">PriceMin</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Riven, object>(x=>x.PriceMax)">PriceMax</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Riven, object>(x=>x.UnfilteredPriceAvg)">UnfilteredPriceAvg</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Riven, object>(x=>x.UnfilteredPriceMin)">UnfilteredPriceMin</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Riven, object>(x=>x.UnfilteredPriceMax)">UnfilteredPriceMax</MudTableSortLabel></MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Name">@context.Name</MudTd>
-        <MudTd DataLabel="Trade Chat (5 days)">@context.Count</MudTd>
-        <MudTd DataLabel="PriceAvg">@context.PriceAvg</MudTd>
-        <MudTd DataLabel="PriceMin">@context.PriceMin</MudTd>
-        <MudTd DataLabel="PriceMax">@context.PriceMax</MudTd>
-        <MudTd DataLabel="UnfilteredPriceAvg">@context.UnfilteredPriceAvg</MudTd>
-        <MudTd DataLabel="UnfilteredPriceMin">@context.UnfilteredPriceMin</MudTd>
-        <MudTd DataLabel="UnfilteredPriceMax">@context.UnfilteredPriceMax</MudTd>
-    </RowTemplate>
-    <PagerContent>
-        <MudTablePager PageSizeOptions="new int[]{50, 100, 200}" />
-    </PagerContent>
-</MudTable>*@
-<BlazorTable.Table TableItem="Riven" Items="weapons" PageSize="50" style='@(GVState.IsDarkMode.Equals(true) ? "color: #dae0e5" : "")'>
+@*<BlazorTable.Table TableItem="Riven" Items="weapons" PageSize="50" style='@(GVState.IsDarkMode.Equals(true) ? "color: #dae0e5" : "")'>
     <BlazorTable.LoadingDataTemplate>
         Loading...
     </BlazorTable.LoadingDataTemplate>
@@ -67,17 +42,54 @@
         </div>
     </BlazorTable.DetailTemplate>
     <BlazorTable.Pager ShowPageNumber="true" ShowTotalCount="true"/>
-</BlazorTable.Table>
+</BlazorTable.Table>*@
 
 
-<MudButton  Variant="MudBlazor.Variant.Filled" EndIcon="@Icons.Material.Filled.ArrowDownward" Style="background-color: yellowgreen; color: white; width: 200px; height: 60px;" @onclick=@(async () => await BlazorDownloadFileService.DownloadFileFromText("Export.csv", csv.Replace(',', ';'), System.Text.Encoding.UTF8, "text/csv"))>
+@*<MudButton  Variant="MudBlazor.Variant.Filled" EndIcon="@Icons.Material.Filled.ArrowDownward" Style="background-color: yellowgreen; color: white; width: 200px; height: 60px;" @onclick=@(async () => await BlazorDownloadFileService.DownloadFileFromText("Export.csv", csv.Replace(',', ';'), System.Text.Encoding.UTF8, "text/csv"))>
     Dowload as csv
-</MudButton>
+</MudButton>*@
 
-
+<RadzenButton Text="Export XLS" Icon="grid_on" Click="@(async () => await BlazorDownloadFileService.DownloadFileFromText("Export.csv", csv.Replace(',', ';'), System.Text.Encoding.UTF8, "text/csv"))" Class="mb-4 mr-2" />
+<RadzenDataGrid @ref="grid" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@weapons" TItem="Riven" PageSize="18">
+    <Template Context="order">
+        <RadzenCard Style="margin-bottom:20px">
+            <div style="color:green">
+                Top 5 Buffs(by popularity): <br/>
+                @(order.RivenStats.Buffs[0].Name)<br/>
+                @(order.RivenStats.Buffs[1].Name)<br/>
+                @(order.RivenStats.Buffs[2].Name)<br/>
+                @(order.RivenStats.Buffs[3].Name)<br/>
+                @(order.RivenStats.Buffs[4].Name)<br/>
+            </div>
+        </RadzenCard>
+        <RadzenCard Style="margin-bottom:20px">
+            <div style="color:#990000">
+                Top 5 Curses(by popularity): <br/>
+                @(order.RivenStats.Curses[0].Name)<br/>
+                @(order.RivenStats.Curses[1].Name)<br/>
+                @(order.RivenStats.Curses[2].Name)<br/>
+                @(order.RivenStats.Curses[3].Name)<br/>
+                @(order.RivenStats.Curses[4].Name)<br/>
+            </div>
+        </RadzenCard>
+    </Template>
+    
+    <Columns>
+        <RadzenDataGridColumn TItem="Riven" Property="Name" Title="Weapon Name" />
+        <RadzenDataGridColumn TItem="Riven" Property="Count" Title="Trade Chat (5 days)" />
+        <RadzenDataGridColumn TItem="Riven" Property="AverageUnrolled" Title="UnrolledAvg" />
+        <RadzenDataGridColumn TItem="Riven" Property="PriceAvg" Title="PriceAvg" />
+        <RadzenDataGridColumn TItem="Riven" Property="PriceMin" Title="PriceMin" />
+        <RadzenDataGridColumn TItem="Riven" Property="PriceMax" Title="PriceMax" />
+        <RadzenDataGridColumn TItem="Riven" Property="UnfilteredPriceAvg" Title="UnfilteredPriceAvg" />
+        <RadzenDataGridColumn TItem="Riven" Property="UnfilteredPriceMin" Title="UnfilteredPriceMin" />
+        <RadzenDataGridColumn TItem="Riven" Property="UnfilteredPriceMax" Title="UnfilteredPriceMax" />
+    </Columns>
+</RadzenDataGrid>
 
 @code{
     [Inject] IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
+    RadzenDataGrid<Riven> grid;
 
     private bool enabled = true;
 

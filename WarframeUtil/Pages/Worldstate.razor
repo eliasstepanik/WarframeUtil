@@ -44,19 +44,19 @@
 
 
 @code {
-    Root worldstate { get; set; }
-    private Timer timer;
+    Root? WorldstateRoot { get; set; }
+    private Timer? _timer;
 
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
         {
-            timer = new Timer();
-            timer.Interval = 30000;
-            timer.Elapsed += OnTimerInterval;
-            timer.AutoReset = true;
+            _timer = new Timer();
+            _timer.Interval = 30000;
+            _timer.Elapsed += OnTimerInterval;
+            _timer.AutoReset = true;
     // Start the timer
-            timer.Enabled = true;
+            _timer.Enabled = true;
         }
         base.OnAfterRender(firstRender);
     }
@@ -71,25 +71,32 @@
     {
     // During prerender, this component is rendered without calling OnAfterRender and then immediately disposed
     // this mean timer will be null so we have to check for null or use the Null-conditional operator ? 
-        timer?.Dispose();
+        _timer?.Dispose();
     }
     
     
     
     
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        worldstate = await GetWorldstate();
+        WorldstateRoot = GetWorldstate();
     }
     
-    private async Task<Root> GetWorldstate()
+    private Root? GetWorldstate()
     {
-        var json = new WebClient().DownloadString("https://content.warframe.com/dynamic/worldState.php");
-        return JsonConvert.DeserializeObject<WarframeUtil.Data.Root>(json);
+        HttpClient client = new HttpClient();
+        using (HttpResponseMessage response = client.GetAsync("https://content.warframe.com/dynamic/worldState.php").Result)
+        {
+            using (HttpContent content = response.Content)
+            {
+                var json = content.ReadAsStringAsync().Result;
+                return JsonConvert.DeserializeObject<Root>(json);
+            } 
+        }
     }
     
-    private async Task IncrementCount()
+    private void IncrementCount()
     {
-        worldstate = await GetWorldstate();
+        WorldstateRoot = GetWorldstate();
     }
 }
