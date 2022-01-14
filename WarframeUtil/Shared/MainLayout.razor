@@ -1,7 +1,5 @@
 ﻿@using MudBlazor.Utilities
 @inherits LayoutComponentBase
-@inject WarframeUtil.Data.GVState _gvState;
-@implements IDisposable
 
 <MudThemeProvider Theme="_theme"/> @*@bind-IsDarkMode="_isDarkMode"*@
 <MudDialogProvider />
@@ -11,10 +9,9 @@
     <MudAppBar Elevation="0">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudSpacer />
-        <MudSwitch Color="Color.Primary" Class="ma-4" T="bool" CheckedChanged="DarkMode" Label="Toggle Light/Dark Mode" />
         <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Link="https://github.com/eliasstepanik/WarframeUtil" Target="_blank" />
     </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" Elevation="1" Class="@(_gvState.IsDarkMode.Equals(true) ? "bg-dark" : "")">
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
         <NavMenu/>
     </MudDrawer>
     <MudMainContent>
@@ -33,30 +30,5 @@
     {
         _drawerOpen = !_drawerOpen;
     }
-    
-    void DarkMode(bool value)
-    {
-        _gvState.SetDarkMode(value);
-        _theme = !value ? new MudTheme() : new MudTheme
-        {
-            Palette = new Palette()
-            {
-                Black = "#27282f",
-                Background = "#32343d",
-                BackgroundGrey = "#27282f",
-                Surface = "#373840",
-                TextPrimary = "#ffffffb2",
-                TextSecondary = "rgba(255,255,255, 0.50)"
-            }
-        };;
-    }
-    
-    protected override void OnInitialized()
-    {
-        _gvState.OnChange += StateHasChanged;
-    }
-    public void Dispose()
-    {
-        _gvState.OnChange -= StateHasChanged;
-    }
+
 }

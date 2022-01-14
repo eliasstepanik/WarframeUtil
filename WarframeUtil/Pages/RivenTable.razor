@@ -5,7 +5,6 @@
 @using BlazorTable
 @using ServiceStack
 @using SimpleJSON
-@inject Data.GVState GVState;
 
 <PageTitle>RivenTable</PageTitle>
 <h2>RivenTable</h2>
@@ -228,16 +227,6 @@
     public string GetData()
     {
         return new WebClient().DownloadString("https://10o.io/pricehistory.json?v2");
-    }
-    
-    protected override void OnInitialized()
-    {
-        GVState.OnChange += StateHasChanged;
-
-    }
-    public void Dispose()
-    {
-        GVState.OnChange -= StateHasChanged;
     }
 
 }

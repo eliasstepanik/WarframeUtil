@@ -9,7 +9,7 @@ using WarframeUtil.Data;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = "server=sailehd.de;port=3306;database=WarframeUtil;user=Warframe;password=AJDhshmzt463;";
+var connectionString = "server=sailehd.de;port=3307;database=WarframeUtil;user=warframe;password=AJDhshmzt463;";
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 27));
 // Add services to the container.
 builder.Services.AddRazorPages();
