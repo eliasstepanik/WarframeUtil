@@ -1,12 +1,16 @@
+using System.Configuration;
+using System.Text.Unicode;
 using BlazorDownloadFile;
 using BlazorTable;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.EntityFrameworkCore;
 using WarframeUtil.Data;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
+var connectionString = "server=sailehd.de;port=3306;database=WarframeUtil;user=Warframe;password=AJDhshmzt463;";
+var serverVersion = new MySqlServerVersion(new Version(8, 0, 27));
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -15,6 +19,11 @@ builder.Services.AddMudServices();
 builder.Services.AddBlazorTable();
 builder.Services.AddBlazorDownloadFile(ServiceLifetime.Scoped);
 builder.Services.AddScoped<GVState>();
+builder.Services.AddDbContext<ApplicationDbContext>(options => options
+    .UseMySql(connectionString, serverVersion)
+    .LogTo(Console.WriteLine, LogLevel.Information)
+    .EnableSensitiveDataLogging()
+    .EnableDetailedErrors());
 
 var app = builder.Build();
 
