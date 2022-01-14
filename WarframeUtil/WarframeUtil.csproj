@@ -24,4 +24,8 @@
     <PackageReference Include="ServiceStack.Text" Version="5.13.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\js" />
+  </ItemGroup>
+
 </Project>
