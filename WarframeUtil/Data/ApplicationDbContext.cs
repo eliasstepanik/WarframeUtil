@@ -12,13 +12,24 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
             
-        /*modelBuilder.Entity<Product.ImagePath>()
-            .HasOne(x => x.Product)
-            .WithMany(x => x.AdditionalImages)
-            .HasForeignKey(x => x.ProductId);*/
-       
+        modelBuilder.Entity<Price>()
+            .HasOne(x => x.RivenDbClass)
+            .WithMany(x => x.Prices)
+            .HasForeignKey(x => x.RivenDBClassId);
+        modelBuilder.Entity<PriceAvg>()
+            .HasOne(x => x.RivenDbClass)
+            .WithMany(x => x.PriceAvg)
+            .HasForeignKey(x => x.RivenDBClassId);
+        modelBuilder.Entity<UnrolledAvg>()
+            .HasOne(x => x.RivenDbClass)
+            .WithMany(x => x.UnrolledAvg)
+            .HasForeignKey(x => x.RivenDBClassId);
+        modelBuilder.Entity<DbDate>()
+            .HasOne(x => x.RivenDbClass)
+            .WithMany(x => x.DDate)
+            .HasForeignKey(x => x.RivenDBClassId);
             
     }
 
-    //public DbSet<WarframeItem> WarframeItems { get; set; }
+    public DbSet<RivenDBClass> Rivens { get; set; }
 }

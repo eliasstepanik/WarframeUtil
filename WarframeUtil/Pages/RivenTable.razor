@@ -64,7 +64,7 @@
                         <RadzenAxisTitle Text="Price in p" />
                     </RadzenValueAxis>
                 </RadzenChart>*@
-                <LineChart Value="riven"/>
+                @* <LineChart Value="riven"/> *@
             </div>
         </div>
     </Template>
@@ -87,8 +87,6 @@
     RadzenDataGrid<Riven> grid;
 
     private bool enabled = true;
-
-    public string url = "https://10o.io/pricehistory.json?v2";
     public List<Riven> weapons { get; set; }
 
     public string csv { get; set; }
@@ -220,7 +218,7 @@
             
             foreach (var item in prices)
             {
-                pricesPrice.Add(new Price(item));
+                pricesPrice.Add(new Price() { price = item });
             }
             
             

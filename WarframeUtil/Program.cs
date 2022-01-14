@@ -19,11 +19,12 @@ builder.Services.AddMudServices();
 builder.Services.AddBlazorTable();
 builder.Services.AddBlazorDownloadFile(ServiceLifetime.Scoped);
 builder.Services.AddScoped<GVState>();
+builder.Services.AddSingleton<PereoidicExecutor>();
 builder.Services.AddDbContext<ApplicationDbContext>(options => options
     .UseMySql(connectionString, serverVersion)
     .LogTo(Console.WriteLine, LogLevel.Information)
     .EnableSensitiveDataLogging()
-    .EnableDetailedErrors());
+    .EnableDetailedErrors(), ServiceLifetime.Singleton);
 
 var app = builder.Build();
 
