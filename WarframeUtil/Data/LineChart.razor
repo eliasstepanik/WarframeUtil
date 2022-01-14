@@ -1,0 +1,24 @@
+﻿@using System.Globalization
+<RadzenChart>
+    <RadzenLineSeries Data="@Value" CategoryProperty="" Title="PriceAvg" ValueProperty="PriceAvg" RenderingOrder="1">
+        <RadzenMarkers MarkerType="MarkerType.Circle" />
+    </RadzenLineSeries>
+    <RadzenLineSeries Data="@Value" CategoryProperty="" Title="UnrolledAvg" ValueProperty="AverageUnrolled" RenderingOrder="2">
+        <RadzenMarkers MarkerType="MarkerType.Circle" />
+    </RadzenLineSeries>
+    <RadzenCategoryAxis Padding="20" FormatString="{0:MMM}" />
+    <RadzenValueAxis Formatter="@FormatDate">
+        <RadzenGridLines Visible="true" />
+        <RadzenAxisTitle Text="Price in p" />
+    </RadzenValueAxis>
+</RadzenChart>
+
+@code {
+    [Parameter]
+    public Riven Value { get; set; }
+    
+    string FormatDate(object value)
+    {
+        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+    }
+}

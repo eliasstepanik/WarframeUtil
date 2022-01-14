@@ -2,36 +2,58 @@
 @using WarframeUtil.Data
 @using System.Net
 @using BlazorDownloadFile
-@using BlazorTable
 @using ServiceStack
 @using SimpleJSON
+@using System.Globalization
 
 <PageTitle>RivenTable</PageTitle>
 <h2>RivenTable</h2>
 
+@*<RadzenChart>
+    <RadzenLineSeries Data="@weapons" CategoryProperty="" Title="PriceAvg" ValueProperty="PriceAvg">
+        <RadzenMarkers MarkerType="MarkerType.Circle" />
+    </RadzenLineSeries>
+    <RadzenLineSeries Data="@weapons" CategoryProperty="" Title="UnrolledAvg" ValueProperty="AverageUnrolled">
+        <RadzenMarkers MarkerType="MarkerType.Circle" />
+    </RadzenLineSeries>
+    <RadzenCategoryAxis Padding="20" FormatString="{0:MMM}" />
+    <RadzenValueAxis Formatter="@FormatDate">
+        <RadzenGridLines Visible="true" />
+        <RadzenAxisTitle Text="Price in p" />
+    </RadzenValueAxis>
+</RadzenChart>*@
+
+
 <RadzenButton Text="Export CSV" Icon="grid_on" Click="@(async () => await BlazorDownloadFileService.DownloadFileFromText("Export.csv", csv.Replace(',', ';'), System.Text.Encoding.UTF8, "text/csv"))" Class="mb-4 mr-2" Style="background: #26b050"/>
 <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@weapons" TItem="Riven" PageSize="18" >
-    <Template Context="order">
-        <RadzenCard Style="margin-bottom:20px">
-            <div style="color:#26b050">
-                Top 5 Buffs(by popularity): <br/>
-                @(order.RivenStats.Buffs[0].Name)<br/>
-                @(order.RivenStats.Buffs[1].Name)<br/>
-                @(order.RivenStats.Buffs[2].Name)<br/>
-                @(order.RivenStats.Buffs[3].Name)<br/>
-                @(order.RivenStats.Buffs[4].Name)<br/>
+    <Template Context="riven">
+        <div>
+            <div>
+                <RadzenCard Style="margin-bottom:20px">
+                    <div style="color:#26b050">
+                        Top 5 Buffs(by popularity): <br/>
+                        @(riven.RivenStats.Buffs[0].Name)<br/>
+                        @(riven.RivenStats.Buffs[1].Name)<br/>
+                        @(riven.RivenStats.Buffs[2].Name)<br/>
+                        @(riven.RivenStats.Buffs[3].Name)<br/>
+                        @(riven.RivenStats.Buffs[4].Name)<br/>
+                    </div>
+                </RadzenCard>
+                <RadzenCard Style="margin-bottom:20px">
+                    <div style="color:crimson">
+                        Top 5 Curses(by popularity): <br/>
+                        @(riven.RivenStats.Curses[0].Name)<br/>
+                        @(riven.RivenStats.Curses[1].Name)<br/>
+                        @(riven.RivenStats.Curses[2].Name)<br/>
+                        @(riven.RivenStats.Curses[3].Name)<br/>
+                        @(riven.RivenStats.Curses[4].Name)<br/>
+                    </div>
+                </RadzenCard>
             </div>
-        </RadzenCard>
-        <RadzenCard Style="margin-bottom:20px">
-            <div style="color:crimson">
-                Top 5 Curses(by popularity): <br/>
-                @(order.RivenStats.Curses[0].Name)<br/>
-                @(order.RivenStats.Curses[1].Name)<br/>
-                @(order.RivenStats.Curses[2].Name)<br/>
-                @(order.RivenStats.Curses[3].Name)<br/>
-                @(order.RivenStats.Curses[4].Name)<br/>
+            <div >
+                @*<LineChart Value="riven"/>*@
             </div>
-        </RadzenCard>
+        </div>
     </Template>
     
     <Columns>
@@ -165,7 +187,7 @@
             List<int> filteredTotalPrices = new List<int>();
             foreach (int item in prices)//filter unreasonably high prices on all rivens
             {
-                if (item < (int) Math.Round(prices.Average() * 0.87))
+                if (item < (int) Math.Round(prices.Average() * 0.90))
                 {
                     filteredTotalPrices.Add(item);
                 }
