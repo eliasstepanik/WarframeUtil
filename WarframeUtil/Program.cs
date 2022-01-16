@@ -1,5 +1,6 @@
 using System.Configuration;
 using System.Text.Unicode;
+using Blazor.Analytics;
 using BlazorDownloadFile;
 using BlazorTable;
 using Microsoft.AspNetCore.Components;
@@ -25,6 +26,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options
     .LogTo(Console.WriteLine, LogLevel.None)
     .EnableSensitiveDataLogging()
     .EnableDetailedErrors(), ServiceLifetime.Singleton);
+builder.Services.AddGoogleAnalytics("UA-170984918-1");
 
 var app = builder.Build();
 

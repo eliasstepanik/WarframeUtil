@@ -2,6 +2,7 @@
 @using WarframeUtil.Data
 @inject PereoidicExecutor _pereoidicExecutor;
 @inject ApplicationDbContext db;
+@inject Blazor.Analytics.IAnalytics Analytics
 
 <PageTitle>Index</PageTitle>
 
@@ -37,6 +38,8 @@
 <MudAlert Severity="Severity.Normal">You can find documentation and examples on our website here: <MudLink Href="https://mudblazor.com" Typo="Typo.body2" Color="Color.Inherit"><b>www.mudblazor.com</b></MudLink></MudAlert>
 *@
 
+
+
 @code{
 
     protected override void OnInitialized()
@@ -46,8 +49,9 @@
         if (!isLocal)
         {
             _pereoidicExecutor.StartExecuting();
+            
         }
-        
+           
     }
 
 }

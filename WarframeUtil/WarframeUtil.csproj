@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Blazor-Analytics" Version="3.10.0" />
     <PackageReference Include="BlazorDownloadFile" Version="2.3.1" />
     <PackageReference Include="BlazorTable" Version="1.17.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
