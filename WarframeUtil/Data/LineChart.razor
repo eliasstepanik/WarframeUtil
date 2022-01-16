@@ -2,6 +2,9 @@
 @using System.Linq
 @using Microsoft.EntityFrameworkCore
 @inject ApplicationDbContext _db;
+@implements IDisposable
+@using System.Timers
+
 
 <RadzenChart @ref="RadzenChart">
     <RadzenLineSeries Data="@Avg" CategoryProperty="ItemDate" Title="PriceAvg" ValueProperty="PriceAvg">
@@ -32,7 +35,12 @@
     {
         dings = CurrentRiven.Prices.ToArray();
         
-        //RadzenChart.Culture = CultureInfo.CreateSpecificCulture("en-US");        
+        //RadzenChart.Culture = CultureInfo.CreateSpecificCulture("en-US");     
+        UpdateRivenHistory();
+    }
+
+    public void UpdateRivenHistory()
+    {
         
         
         
@@ -71,7 +79,7 @@
         
         
         
-         /*Avg = new DataItem[] //example data
+        /*Avg = new DataItem[] //example data
          {
              new DataItem(){ UnrolledAvg = 5, ItemDate = DateTime.Now, PriceAvg = 1},
              new DataItem(){ UnrolledAvg = 7, ItemDate = DateTime.Parse("14.01.2022"), PriceAvg = 2},
@@ -107,4 +115,39 @@
     {
         return ((double)value).ToString()+ "p";
     }
+    
+    private Timer? _timer;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _timer = new Timer();
+            _timer.Interval = 10000;
+            _timer.Elapsed += OnTimerInterval;
+            _timer.AutoReset = true;
+    // Start the timer
+            _timer.Enabled = true;
+        }
+        base.OnAfterRender(firstRender);
+    }
+    
+    private void OnTimerInterval(object sender, ElapsedEventArgs e)
+    {
+        IncrementCount();
+        InvokeAsync(() => StateHasChanged());
+    }
+    
+    public void Dispose()
+    {
+    // During prerender, this component is rendered without calling OnAfterRender and then immediately disposed
+    // this mean timer will be null so we have to check for null or use the Null-conditional operator ? 
+        _timer?.Dispose();
+    }
+    
+    private void IncrementCount()
+    {
+        UpdateRivenHistory();
+    }
+
 }

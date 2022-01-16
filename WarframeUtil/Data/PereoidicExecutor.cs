@@ -145,7 +145,9 @@ public class PereoidicExecutor : IDisposable
                 }
             });
         }
-
+        
+        
+        
         foreach (var item in rivens)
         {
             var dbData = db.Rivens
