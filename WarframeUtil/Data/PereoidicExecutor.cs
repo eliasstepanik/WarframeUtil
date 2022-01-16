@@ -30,6 +30,7 @@ public class PereoidicExecutor : IDisposable
     {
         if (!_Running)
         {
+            //TimerLogic();
             //initiate a timer
             _Timer = new System.Timers.Timer();
             _Timer.Interval = 36000000;
@@ -117,7 +118,7 @@ public class PereoidicExecutor : IDisposable
                 filteredTotalPrices.Add(1);
             }
 
-
+            
             rivens.Add(new RivenDBClass()
             {
                 Name = weapon["name"].ToString().Trim('\"'),
@@ -147,7 +148,30 @@ public class PereoidicExecutor : IDisposable
 
         foreach (var item in rivens)
         {
-            db.Add(item);
+            var dbData = db.Rivens
+                .Include(d => d.DDate)
+                .Include(d => d.PriceAvg)
+                .Include(d => d.UnrolledAvg)
+                .AsSplitQuery()
+                .ToList();
+            if (!dbData.Exists(x => x.Name == item.Name))
+            {
+                db.Add(item);
+            }
+            else
+            {
+                var currentRiven = dbData.Last(x => x.Name.Equals(item.Name));
+                currentRiven.DDate.Add(item.DDate.Last());
+                //currentRiven.Prices.Add(item.PriceAvg.Last());
+                currentRiven.UnrolledAvg.Add(item.UnrolledAvg.Last());
+                currentRiven.PriceAvg.Add(item.PriceAvg.Last());
+                db.Rivens.Update(currentRiven);
+            }
+            
+            
+            
+            
+            
         }
         
 
