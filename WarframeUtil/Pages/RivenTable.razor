@@ -29,8 +29,8 @@
     <Template Context="riven" >
         <RadzenCard>
             <div>
-                <div style="width: 20%;float: left;">
-                    <div style="color:#26b050; padding: 10px">
+                <div style="width: 17.5%;float: left;">
+                    <div style="color:#26b050; padding-bottom: 10px">
                         <RadzenCard>
                             Top 5 Buffs(by popularity): <br/>
                             @(riven.RivenStats.Buffs[0].Name)<br/>
@@ -40,7 +40,7 @@
                             @(riven.RivenStats.Buffs[4].Name)<br/>
                         </RadzenCard>
                     </div>
-                    <div style="color:crimson;padding: 10px">
+                    <div style="color:crimson">
                         <RadzenCard>
                             Top 5 Curses(by popularity): <br/>
                             @(riven.RivenStats.Curses[0].Name)<br/>
@@ -51,8 +51,7 @@
                         </RadzenCard>
                     </div>
                 </div>
-
-                <div style="width:80%; float: right; color: black; alignment: right; padding: 10px">
+                <div style="width:82.5%; float: right; color: black; alignment: right; padding: 10px">
                     <LineChart CurrentRiven="riven"/>
                 </div>
             </div>
