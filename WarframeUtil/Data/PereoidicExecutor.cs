@@ -42,7 +42,8 @@ public class PereoidicExecutor : IDisposable
 
     void HandleTimer(object source, ElapsedEventArgs e)
     {
-        TimerLogic();
+        TimerLogic(); 
+
         //Execute required jobn
         //notify any subscibers to the event
         OnJobExecuted();
@@ -133,6 +134,5 @@ public class PereoidicExecutor : IDisposable
 
 
         await db.SaveChangesAsync();
-        Console.WriteLine("deine ma");
     }
 }

@@ -1,29 +1,79 @@
 ﻿@using System.Globalization
+@using System.Linq
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext _db;
+
 <RadzenChart>
-    <RadzenLineSeries Data="@dings" CategoryProperty="" Title="PriceAvg" ValueProperty="Price" RenderingOrder="1">
+    <RadzenLineSeries Data="@Avg" CategoryProperty="ItemDate" Title="PriceAvg" ValueProperty="PriceAvg">
         <RadzenMarkers MarkerType="MarkerType.Circle" />
     </RadzenLineSeries>
-    <RadzenLineSeries Data="@dings" CategoryProperty="" Title="UnrolledAvg" ValueProperty="Price" RenderingOrder="2">
+    <RadzenLineSeries Data="@Avg" CategoryProperty="ItemDate" Title="UnrolledAvg" ValueProperty="UnrolledAvg">
         <RadzenMarkers MarkerType="MarkerType.Circle" />
     </RadzenLineSeries>
-    <RadzenCategoryAxis Padding="20" FormatString="{0:MMM}" />
-    <RadzenValueAxis Formatter="@FormatDate">
+    <RadzenCategoryAxis Padding="20" FormatString="{0:M}" />
+    <RadzenValueAxis Formatter="@FormatAsP">
         <RadzenGridLines Visible="true" />
-        <RadzenAxisTitle Text="Price in p" />
+        <RadzenAxisTitle Text="" />
     </RadzenValueAxis>
 </RadzenChart>
 
 @code {
     [Parameter]
-    public Riven Value { get; set; }
+    public Riven CurrentRiven { get; set; }
     public Price[] dings { get; set; }
+    
+    public List<RivenDBClass> Current { get; set; }
+    DataItem[] Avg { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        dings = Value.Prices.ToArray();
+        dings = CurrentRiven.Prices.ToArray();
+        
+        
+        /*
+        var dbData = _db.Rivens.ToList();
+
+        Current = _db.Rivens.Where(item => item.Name == CurrentRiven.Name).ToList();
+
+        var dates = Current.Last().DDate.ToList();
+        var priceAvgs = Current.Last().UnrolledAvg.ToList();
+        var unrolledAvgs = Current.Last().PriceAvg.ToList();
+        */
+        
+        
+        
+         Avg = new DataItem[] //example data
+         {
+             new DataItem(){ UnrolledAvg = 5, ItemDate = DateTime.Now, PriceAvg = 1},
+             new DataItem(){ UnrolledAvg = 7, ItemDate = DateTime.Parse("14.01.2022"), PriceAvg = 2},
+             new DataItem(){ UnrolledAvg = 8, ItemDate = DateTime.Parse("12.01.2022"), PriceAvg = 3},
+             new DataItem(){ UnrolledAvg = 9, ItemDate = DateTime.Parse("10.01.2022"), PriceAvg = 4}
+         };
+
+        Console.WriteLine(DateTime.Now);
+        /*
+        for (int index = dates.Count; index >= 0; index--)
+        {
+            Avg.Append(new DataItem()
+            {
+                ItemDate = dates[index].DDate,
+                PriceAvg = priceAvgs[index].price,
+                UnrolledAvg = unrolledAvgs[index].price
+            });
+        }
+        */
     }
 
-    string FormatDate(object value)
+
+    class DataItem
     {
-        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+        public DateTime ItemDate { get; set; }
+        public int PriceAvg { get; set; }
+        public int UnrolledAvg { get; set; }
+    }
+
+    string FormatAsP(object value)
+    {
+        return ((double)value).ToString()+ "p";
     }
 }

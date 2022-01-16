@@ -77,7 +77,6 @@ public class PriceAvg
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Key]
     public int PriceAvgId { get; set; }
-    
     public int price { get; set; }
     public int RivenDBClassId { get; set; }
     public RivenDBClass RivenDbClass { get; set; }
@@ -87,7 +86,6 @@ public class UnrolledAvg
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Key]
     public int UnrolledAvgId { get; set; }
-    
     public int price { get; set; }
     public int RivenDBClassId { get; set; }
     public RivenDBClass RivenDbClass { get; set; }
@@ -97,7 +95,6 @@ public class DbDate
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Key]
     public int DateId { get; set; }
-    
     public DateTime DDate { get; set; }
     public int RivenDBClassId { get; set; }
     public RivenDBClass RivenDbClass { get; set; }

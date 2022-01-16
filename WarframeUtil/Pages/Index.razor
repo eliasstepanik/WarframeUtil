@@ -41,7 +41,14 @@
 
     protected override void OnInitialized()
     {
-        _pereoidicExecutor.StartExecuting();
+        bool isLocal = true; //dont update db if local
+        
+        
+        if (!isLocal)
+        {
+            _pereoidicExecutor.StartExecuting();
+        }
+        
     }
 
 }
