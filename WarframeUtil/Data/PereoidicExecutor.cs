@@ -90,37 +90,37 @@ public class PereoidicExecutor : IDisposable
                     prices.Add(int.Parse(riven["price"]));
                 }
             }
-            List<UnrolledAvg> filteredUnrolledPrices = new List<UnrolledAvg>();
+            List<int> filteredUnrolledPrices = new List<int>();
             foreach (int item in unrolledPrices)//filter unreasonably high prices on unrolled rivens
             {
                 if (item < (int) Math.Round(unrolledPrices.Average() * 0.75))
                 {
-                    filteredUnrolledPrices.Add(new UnrolledAvg() { price = item});
+                    filteredUnrolledPrices.Add(item);
                 }
             }
             if (filteredUnrolledPrices.Count == 0)
             {
-                filteredUnrolledPrices.Add(new UnrolledAvg() { price = 1});
+                filteredUnrolledPrices.Add(1);
             }
             
-            List<PriceAvg> filteredTotalPrices = new List<PriceAvg>();
+            List<int> filteredTotalPrices = new List<int>();
             foreach (int item in prices)//filter unreasonably high prices on all rivens
             {
                 if (item < (int) Math.Round(prices.Average() * 0.90))
                 {
-                    filteredTotalPrices.Add(new PriceAvg() { price = item});
+                    filteredTotalPrices.Add(item);
                 }
             }
             if (filteredTotalPrices.Count == 0)
             {
-                filteredTotalPrices.Add(new PriceAvg() { price = 1});
+                filteredTotalPrices.Add(1);
             }
 
 
             rivens.Add(new RivenDBClass()
             {
                 Name = weapon["name"].ToString().Trim('\"'),
-                PriceAvg = filteredTotalPrices,
+                PriceAvg = new List<PriceAvg>().Add(new PriceAvg(){ price = int.Parse(Math.Round(filteredTotalPrices.Average()))}),
                 UnrolledAvg = filteredUnrolledPrices,
                 DDate = new List<DbDate>(){new DbDate(){ DDate = DateTime.Now}}
             });

@@ -30,15 +30,20 @@
         dings = CurrentRiven.Prices.ToArray();
         
         
-        /*
+        
         var dbData = _db.Rivens.ToList();
 
-        Current = _db.Rivens.Where(item => item.Name == CurrentRiven.Name).ToList();
+        Current = _db.Rivens
+            .Where(item => item.Name == CurrentRiven.Name)
+            .Include(d => d.DDate)
+            .Include(d => d.PriceAvg)
+            .Include(d => d.UnrolledAvg)
+            .ToList();
 
         var dates = Current.Last().DDate.ToList();
-        var priceAvgs = Current.Last().UnrolledAvg.ToList();
-        var unrolledAvgs = Current.Last().PriceAvg.ToList();
-        */
+        var priceAvgs = Current.Last().PriceAvg.ToList();
+        var unrolledAvgs = Current.Last().UnrolledAvg.ToList();
+        
         
         
         
@@ -51,7 +56,7 @@
          };
 
         Console.WriteLine(DateTime.Now);
-        /*
+       
         for (int index = dates.Count; index >= 0; index--)
         {
             Avg.Append(new DataItem()
@@ -61,7 +66,7 @@
                 UnrolledAvg = unrolledAvgs[index].price
             });
         }
-        */
+     
     }
 
 
