@@ -3,7 +3,7 @@
 @using Microsoft.EntityFrameworkCore
 @inject ApplicationDbContext _db;
 
-<RadzenChart>
+<RadzenChart @ref="RadzenChart">
     <RadzenLineSeries Data="@Avg" CategoryProperty="ItemDate" Title="PriceAvg" ValueProperty="PriceAvg">
         <RadzenMarkers MarkerType="MarkerType.Circle" />
     </RadzenLineSeries>
@@ -22,6 +22,9 @@
     public Riven CurrentRiven { get; set; }
     public Price[] dings { get; set; }
     
+    public RadzenChart RadzenChart { get; set; }
+    
+    
     public List<RivenDBClass> Current { get; set; }
     DataItem[] Avg { get; set; }
 
@@ -29,44 +32,67 @@
     {
         dings = CurrentRiven.Prices.ToArray();
         
+        //RadzenChart.Culture = CultureInfo.CreateSpecificCulture("en-US");        
         
         
-        var dbData = _db.Rivens.ToList();
-
-        Current = _db.Rivens
-            .Where(item => item.Name == CurrentRiven.Name)
+        
+        
+        var dbData = _db.Rivens
             .Include(d => d.DDate)
             .Include(d => d.PriceAvg)
             .Include(d => d.UnrolledAvg)
+            .AsSplitQuery()
             .ToList();
 
+        Current = dbData.Where(d => d.Name == CurrentRiven.Name).ToList();
         var dates = Current.Last().DDate.ToList();
         var priceAvgs = Current.Last().PriceAvg.ToList();
         var unrolledAvgs = Current.Last().UnrolledAvg.ToList();
+
+        /*List<DbDate> datesList = new List<DbDate>();
+        
+        /*foreach (var date in dates)
+        {
+            
+            System.Globalization.CultureInfo cultureinfo =
+                new System.Globalization.CultureInfo("en-US");
+            DateTime dt = DateTime.Parse(date.DDate.ToString(), cultureinfo);
+
+            var dateTemp = new DbDate
+            {
+                DateId = date.DateId,
+                RivenDbClass = date.RivenDbClass,
+                RivenDBClassId = date.RivenDBClassId,
+                DDate = dt
+            };
+            datesList.Add(dateTemp);
+        }#1#*/
         
         
         
         
-         Avg = new DataItem[] //example data
+         /*Avg = new DataItem[] //example data
          {
              new DataItem(){ UnrolledAvg = 5, ItemDate = DateTime.Now, PriceAvg = 1},
              new DataItem(){ UnrolledAvg = 7, ItemDate = DateTime.Parse("14.01.2022"), PriceAvg = 2},
              new DataItem(){ UnrolledAvg = 8, ItemDate = DateTime.Parse("12.01.2022"), PriceAvg = 3},
              new DataItem(){ UnrolledAvg = 9, ItemDate = DateTime.Parse("10.01.2022"), PriceAvg = 4}
-         };
+         };*/
 
-        Console.WriteLine(DateTime.Now);
-       
-        for (int index = dates.Count; index >= 0; index--)
+        //Console.WriteLine(DateTime.Now);
+
+        List<DataItem> AvgTemp = new List<DataItem>();
+
+        for (int i = 0; i < dates.Count; i++)
         {
-            Avg.Append(new DataItem()
+            AvgTemp.Add(new DataItem()
             {
-                ItemDate = dates[index].DDate,
-                PriceAvg = priceAvgs[index].price,
-                UnrolledAvg = unrolledAvgs[index].price
+                ItemDate = dates[i].DDate,
+                PriceAvg = priceAvgs[i].price,
+                UnrolledAvg = unrolledAvgs[i].price
             });
         }
-     
+        Avg = AvgTemp.ToArray();
     }
 
 

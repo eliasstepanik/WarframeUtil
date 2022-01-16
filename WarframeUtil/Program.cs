@@ -22,7 +22,7 @@ builder.Services.AddScoped<GVState>();
 builder.Services.AddSingleton<PereoidicExecutor>();
 builder.Services.AddDbContext<ApplicationDbContext>(options => options
     .UseMySql(connectionString, serverVersion)
-    .LogTo(Console.WriteLine, LogLevel.Information)
+    .LogTo(Console.WriteLine, LogLevel.None)
     .EnableSensitiveDataLogging()
     .EnableDetailedErrors(), ServiceLifetime.Singleton);
 
