@@ -120,9 +120,27 @@ public class PereoidicExecutor : IDisposable
             rivens.Add(new RivenDBClass()
             {
                 Name = weapon["name"].ToString().Trim('\"'),
-                PriceAvg = new List<PriceAvg>().Add(new PriceAvg(){ price = int.Parse(Math.Round(filteredTotalPrices.Average()))}),
-                UnrolledAvg = filteredUnrolledPrices,
-                DDate = new List<DbDate>(){new DbDate(){ DDate = DateTime.Now}}
+                PriceAvg = new List<PriceAvg>()
+                {
+                    new PriceAvg()
+                    {
+                        price = (int) Math.Round(filteredTotalPrices.Average())
+                    }
+                },
+                UnrolledAvg = new List<UnrolledAvg>()
+                {
+                    new UnrolledAvg()
+                    {
+                        price = (int) Math.Round(filteredUnrolledPrices.Average())
+                    }
+                },
+                DDate = new List<DbDate>()
+                {
+                    new DbDate()
+                    {
+                        DDate = DateTime.Now
+                    }
+                }
             });
         }
 
