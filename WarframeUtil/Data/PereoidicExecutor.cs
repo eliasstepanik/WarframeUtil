@@ -46,7 +46,7 @@ public class PereoidicExecutor : IDisposable
     {
         TimerLogic(); 
 
-        //Execute required jobn
+        //Execute required job
         //notify any subscibers to the event
         OnJobExecuted();
     }
@@ -59,16 +59,6 @@ public class PereoidicExecutor : IDisposable
             _Timer.Dispose();
         }
     }
-    
-    
-    // db.Rivens.Add(new RivenDBClass()
-    // {
-    //     DDate = new List<DbDate>(){new DbDate(){ DDate = DateTime.Now}},
-    //     Id = 1,
-    //     PriceAvg = new List<PriceAvg>() { new PriceAvg(){price = 2}},
-    //     Prices = new List<Price>() {new Price() {price = 3}},
-    //     UnrolledAvg = new List<UnrolledAvg>() {new UnrolledAvg() {price = 4}}
-    // });
     public async Task TimerLogic()
     {
         
@@ -145,9 +135,7 @@ public class PereoidicExecutor : IDisposable
                 }
             });
         }
-        
-        
-        
+
         foreach (var item in rivens)
         {
             var dbData = db.Rivens
@@ -169,15 +157,7 @@ public class PereoidicExecutor : IDisposable
                 currentRiven.PriceAvg.Add(item.PriceAvg.Last());
                 db.Rivens.Update(currentRiven);
             }
-            
-            
-            
-            
-            
         }
-        
-
-
         await db.SaveChangesAsync();
     }
 }

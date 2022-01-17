@@ -8,22 +8,6 @@
 
 <PageTitle>RivenTable</PageTitle>
 <h2>RivenTable</h2>
-
-@*<RadzenChart>
-    <RadzenLineSeries Data="@weapons" CategoryProperty="" Title="PriceAvg" ValueProperty="PriceAvg">
-        <RadzenMarkers MarkerType="MarkerType.Circle" />
-    </RadzenLineSeries>
-    <RadzenLineSeries Data="@weapons" CategoryProperty="" Title="UnrolledAvg" ValueProperty="AverageUnrolled">
-        <RadzenMarkers MarkerType="MarkerType.Circle" />
-    </RadzenLineSeries>
-    <RadzenCategoryAxis Padding="20" FormatString="{0:MMM}" />
-    <RadzenValueAxis Formatter="@FormatDate">
-        <RadzenGridLines Visible="true" />
-        <RadzenAxisTitle Text="Price in p" />
-    </RadzenValueAxis>
-</RadzenChart>*@
-
-
 <RadzenButton Text="Export CSV" Icon="grid_on" Click="@(async () => await BlazorDownloadFileService.DownloadFileFromText("Export.csv", csv.Replace(',', ';'), System.Text.Encoding.UTF8, "text/csv"))" Class="mb-4 mr-2" Style="background: #26b050"/>
 <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@weapons" TItem="Riven" PageSize="18" >
     <Template Context="riven" >
@@ -56,25 +40,6 @@
                 </div>
             </div>
         </RadzenCard>
-                
-            
-            @*<div style="margin-bottom:20px; width: 80%; top: 0%; float: right; color: black">
-                
-                $1$<RadzenChart>
-                    <RadzenLineSeries Data="@weapons" CategoryProperty="" Title="PriceAvg" ValueProperty="PriceAvg" RenderingOrder="1">
-                        <RadzenMarkers MarkerType="MarkerType.Circle" />
-                    </RadzenLineSeries>
-                    <RadzenLineSeries Data="@weapons" CategoryProperty="" Title="UnrolledAvg" ValueProperty="AverageUnrolled" RenderingOrder="2">
-                        <RadzenMarkers MarkerType="MarkerType.Circle" />
-                    </RadzenLineSeries>
-                    <RadzenCategoryAxis Padding="20" FormatString="{0:MMM}" />
-                    <RadzenValueAxis Formatter="@FormatDate">
-                        <RadzenGridLines Visible="true" />
-                        <RadzenAxisTitle Text="Price in p" />
-                    </RadzenValueAxis>
-                </RadzenChart>#1#
-                
-            </div>*@
     </Template>
     
     <Columns>
@@ -221,15 +186,6 @@
                 filteredTotalPrices.Add(1);
             }
 
-
-            List<Price> pricesPrice = new List<Price>();
-            
-            foreach (var item in prices)
-            {
-                pricesPrice.Add(new Price() { price = item });
-            }
-            
-            
             Riven currentWeapon = new Riven()
             {
                 Name = weapon["name"].ToString().Trim('\"'),
