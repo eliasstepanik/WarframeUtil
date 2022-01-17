@@ -33,7 +33,7 @@ public class PereoidicExecutor : IDisposable
             //TimerLogic();
             //initiate a timer
             _Timer = new System.Timers.Timer();
-            _Timer.Interval = 36000000;
+            _Timer.Interval = 3600000;
             //_Timer.Interval = 60000;
             _Timer.AutoReset = true;
             _Timer.Enabled = true;
