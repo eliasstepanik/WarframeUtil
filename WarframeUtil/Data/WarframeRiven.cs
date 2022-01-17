@@ -15,7 +15,7 @@ public class Riven
     public double UnfilteredPriceAvg { get; set; }
     public RivenStats RivenStats { get; set; }
     public double AverageUnrolled { get; set; }
-    public List<Price> Prices { get; set; }
+    public List<int> Prices { get; set; }
 }
 
 public class RivenStats

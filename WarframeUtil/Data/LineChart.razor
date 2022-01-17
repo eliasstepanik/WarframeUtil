@@ -2,9 +2,6 @@
 @using System.Linq
 @using Microsoft.EntityFrameworkCore
 @inject ApplicationDbContext _db;
-@implements IDisposable
-@using System.Timers
-
 
 <RadzenChart @ref="RadzenChart">
     <RadzenLineSeries Data="@Avg" CategoryProperty="ItemDate" Title="PriceAvg" ValueProperty="PriceAvg">
@@ -23,28 +20,12 @@
 @code {
     [Parameter]
     public Riven CurrentRiven { get; set; }
-    public Price[] dings { get; set; }
-    
     public RadzenChart RadzenChart { get; set; }
-    
-    
     public List<RivenDBClass> Current { get; set; }
     DataItem[] Avg { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        dings = CurrentRiven.Prices.ToArray();
-        
-        //RadzenChart.Culture = CultureInfo.CreateSpecificCulture("en-US");     
-        UpdateRivenHistory();
-    }
-
-    public void UpdateRivenHistory()
-    {
-        
-        
-        
-        
         var dbData = _db.Rivens
             .Include(d => d.DDate)
             .Include(d => d.PriceAvg)
@@ -56,38 +37,6 @@
         var dates = Current.Last().DDate.ToList();
         var priceAvgs = Current.Last().PriceAvg.ToList();
         var unrolledAvgs = Current.Last().UnrolledAvg.ToList();
-
-        /*List<DbDate> datesList = new List<DbDate>();
-        
-        /*foreach (var date in dates)
-        {
-            
-            System.Globalization.CultureInfo cultureinfo =
-                new System.Globalization.CultureInfo("en-US");
-            DateTime dt = DateTime.Parse(date.DDate.ToString(), cultureinfo);
-
-            var dateTemp = new DbDate
-            {
-                DateId = date.DateId,
-                RivenDbClass = date.RivenDbClass,
-                RivenDBClassId = date.RivenDBClassId,
-                DDate = dt
-            };
-            datesList.Add(dateTemp);
-        }#1#*/
-        
-        
-        
-        
-        /*Avg = new DataItem[] //example data
-         {
-             new DataItem(){ UnrolledAvg = 5, ItemDate = DateTime.Now, PriceAvg = 1},
-             new DataItem(){ UnrolledAvg = 7, ItemDate = DateTime.Parse("14.01.2022"), PriceAvg = 2},
-             new DataItem(){ UnrolledAvg = 8, ItemDate = DateTime.Parse("12.01.2022"), PriceAvg = 3},
-             new DataItem(){ UnrolledAvg = 9, ItemDate = DateTime.Parse("10.01.2022"), PriceAvg = 4}
-         };*/
-
-        //Console.WriteLine(DateTime.Now);
 
         List<DataItem> AvgTemp = new List<DataItem>();
 
@@ -102,8 +51,7 @@
         }
         Avg = AvgTemp.ToArray();
     }
-
-
+    
     class DataItem
     {
         public DateTime ItemDate { get; set; }
@@ -115,39 +63,4 @@
     {
         return ((double)value).ToString()+ "p";
     }
-    
-    private Timer? _timer;
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender)
-        {
-            _timer = new Timer();
-            _timer.Interval = 10000;
-            _timer.Elapsed += OnTimerInterval;
-            _timer.AutoReset = true;
-    // Start the timer
-            _timer.Enabled = true;
-        }
-        base.OnAfterRender(firstRender);
-    }
-    
-    private void OnTimerInterval(object sender, ElapsedEventArgs e)
-    {
-        IncrementCount();
-        InvokeAsync(() => StateHasChanged());
-    }
-    
-    public void Dispose()
-    {
-    // During prerender, this component is rendered without calling OnAfterRender and then immediately disposed
-    // this mean timer will be null so we have to check for null or use the Null-conditional operator ? 
-        _timer?.Dispose();
-    }
-    
-    private void IncrementCount()
-    {
-        UpdateRivenHistory();
-    }
-
 }
