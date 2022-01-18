@@ -4,11 +4,11 @@
 @inject ApplicationDbContext _db;
 
 <RadzenChart @ref="RadzenChart">
-    <RadzenLineSeries Data="@Avg" CategoryProperty="ItemDate" Title="PriceAvg" ValueProperty="PriceAvg">
-        <RadzenMarkers MarkerType="MarkerType.Circle" />
+    <RadzenLineSeries Data="@Avg" CategoryProperty="ItemDate" Title="PriceAvg" ValueProperty="PriceAvg" >
+        <RadzenMarkers MarkerType="MarkerType.Circle" StrokeWidth="0" Size="0"/>
     </RadzenLineSeries>
-    <RadzenLineSeries Data="@Avg" CategoryProperty="ItemDate" Title="UnrolledAvg" ValueProperty="UnrolledAvg">
-        <RadzenMarkers MarkerType="MarkerType.Circle" />
+    <RadzenLineSeries Data="@Avg" CategoryProperty="ItemDate" Title="UnrolledAvg" ValueProperty="UnrolledAvg" >
+        <RadzenMarkers MarkerType="MarkerType.Circle" StrokeWidth="0" Size="0"/>
     </RadzenLineSeries>
     <RadzenCategoryAxis Padding="20" FormatString="{0:M}" />
     <RadzenValueAxis Formatter="@FormatAsP">

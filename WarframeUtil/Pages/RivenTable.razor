@@ -12,8 +12,8 @@
 <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@weapons" TItem="Riven" PageSize="18" >
     <Template Context="riven" >
         <RadzenCard>
-            <div>
-                <div style="width: 17.5%;float: left;">
+            <div style="flex-direction: row; display: flex">
+                <div style="width: auto; float: left;">
                     <div style="color:#26b050; padding-bottom: 10px">
                         <RadzenCard>
                             Top 5 Buffs(by popularity): <br/>
@@ -35,7 +35,7 @@
                         </RadzenCard>
                     </div>
                 </div>
-                <div style="width:82.5%; float: right; color: black; alignment: right; padding: 10px">
+                <div style="width: auto; flex-grow: 3; color: black; alignment: right; padding: 10px">
                     <LineChart CurrentRiven="riven"/>
                 </div>
             </div>
