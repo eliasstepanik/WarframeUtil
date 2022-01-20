@@ -9,7 +9,7 @@
 <PageTitle>RivenTable</PageTitle>
 <h2>RivenTable</h2>
 <RadzenButton Text="Export CSV" Icon="grid_on" Click="@(async () => await BlazorDownloadFileService.DownloadFileFromText("Export.csv", csv.Replace(',', ';'), System.Text.Encoding.UTF8, "text/csv"))" Class="mb-4 mr-2" Style="background: #26b050"/>
-<RadzenDataGrid @ref="grid" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@weapons" TItem="Riven" PageSize="18" >
+<RadzenDataGrid @ref="grid" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" AllowSorting="true" Data="@weapons" TItem="Riven" PageSize="18" >
     <Template Context="riven" >
         <RadzenCard>
             <div style="flex-direction: row; display: flex">
@@ -204,6 +204,7 @@
         }
         csv = weapons.ToCsv();
     }
+    
     
     public string GetData()
     {
