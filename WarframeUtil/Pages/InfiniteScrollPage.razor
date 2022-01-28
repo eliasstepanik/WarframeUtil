@@ -1,0 +1,32 @@
+﻿@page "/InfiniteScroll"
+@using WebshopRazor.Data
+@inject WeatherForecastService _service
+
+<h3>InfiniteScroll</h3>
+
+<InfiniteScroll ObserverTargetId="observerTarget" ObservableTargetReached="(e) => FetchForecasts()">
+	<ul class="text-dark">
+    		@foreach (var forecast in forecasts)
+        	{
+        		<li class="list-group-item">@forecast.Date: @forecast.TemperatureC-@forecast.TemperatureF (@forecast.Summary)</li>
+		}
+
+        	@*The target element that we observe. Once this is reached the callback will be triggered.*@
+        	<li class="list-group-item" id="observerTarget"></li>
+    	</ul>
+</InfiniteScroll>
+
+@code {
+    private List<WeatherForecast> forecasts = new List<WeatherForecast>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchForecasts(); // Initial data
+    }
+
+    private async Task FetchForecasts()
+    {
+        var fetchedForecasts = await _service.GetForecastAsync(DateTime.Now, amount: 20);
+        forecasts.AddRange(fetchedForecasts); // Make sure to use AddRange() to append the new items
+    }
+}

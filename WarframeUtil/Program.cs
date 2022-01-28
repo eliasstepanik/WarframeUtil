@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
 using WarframeUtil.Data;
 using MudBlazor.Services;
+using WebshopRazor.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = "server=sailehd.de;port=3307;database=WarframeUtil;user=warframe;password=;";
@@ -21,6 +22,7 @@ builder.Services.AddBlazorTable();
 builder.Services.AddBlazorDownloadFile(ServiceLifetime.Scoped);
 builder.Services.AddScoped<GVState>();
 builder.Services.AddSingleton<PereoidicExecutor>();
+builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddDbContext<ApplicationDbContext>(options => options
     .UseMySql(connectionString, serverVersion)
     .LogTo(Console.WriteLine, LogLevel.None)

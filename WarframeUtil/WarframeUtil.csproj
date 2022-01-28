@@ -23,10 +23,7 @@
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.0" />
     <PackageReference Include="Radzen.Blazor" Version="3.14.2" />
     <PackageReference Include="ServiceStack.Text" Version="5.13.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\js" />
+    <PackageReference Include="Sve.Blazor.InfiniteScroll" Version="1.0.0-alpha" />
   </ItemGroup>
 
 </Project>

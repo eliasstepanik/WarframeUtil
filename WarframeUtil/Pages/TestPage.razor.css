@@ -1,0 +1,23 @@
+﻿body{
+    margin: 0;
+    font-family: 'Prompt', sans-serif;
+    color: white;
+    background: #202731;
+}
+
+section{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 400px;
+    padding: 100px 20px;
+}
+
+.blue{
+    background: #3c31dd;
+}
+
+.red{
+    background: #dd3f31;
+}
