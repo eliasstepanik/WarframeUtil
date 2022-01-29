@@ -64,11 +64,6 @@
 
     public string csv { get; set; }
     
-    string FormatDate(object value)
-    {
-        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
-    }
-
     protected override async Task OnInitializedAsync()
     {
         weapons = new List<Riven>();

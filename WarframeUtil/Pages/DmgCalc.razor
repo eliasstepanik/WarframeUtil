@@ -1,0 +1,714 @@
+﻿@page "/DmgCalc"
+@using System.Net
+@using Microsoft.EntityFrameworkCore
+@using MudBlazor.Extensions
+@using ServiceStack
+@using Orientation = Radzen.Orientation
+
+<PageTitle>DmgCalc</PageTitle>
+<h2>DmgCalc</h2>
+
+<div style="display: flex; flex-direction: row; padding: 5px">
+    <RadzenButton Text="Calculate" Icon="grid_on" Style="background: #26b050" Click=@(args => OnClick(args)) />
+</div>
+
+
+<div style="display: flex; flex-direction: row">
+    <div style="padding: 5px">
+        <RadzenCard Style="width: fit-content; color: black">
+            <h4>PowerStr</h4>
+            <RadzenNumeric TValue="double" Placeholder="40" @bind-value=@str Step="0.1" Change=@(args => OnChange(args, "")) />
+        </RadzenCard>
+    </div>
+
+    <div style="padding: 5px">
+        <RadzenCard Style="width: fit-content; color: black">
+            <h4>ArmorType</h4>
+            <RadzenDropDown AllowClear="true" TValue="string" Class="w-100" 
+                            Data=@(armorTypes.Select(c => c).Distinct())
+                            Change=@(args => OnChange(args, "selectArmor")) />
+        </RadzenCard>
+    </div>
+</div>
+
+<div style="display: flex; flex-direction: row">
+    <div style="padding: 5px">
+        <RadzenCard Style="width: fit-content; color: black">
+            <h4>Gladiator mod count: @gladMods</h4>
+            <RadzenSlider TValue="int" @bind-Value=@gladMods Min="0" Max="6" Change=@(args => OnChange(args, "")) />
+        </RadzenCard>
+    </div>
+    
+    <div style="padding: 5px">
+        <RadzenCard Style="width: fit-content; color: black">
+            <h4>Combo: @currentCombo</h4>
+            <RadzenSlider TValue="int" @bind-Value=@currentCombo Min="1" Max="13" Change=@(args => OnChange(args, "")) />
+        </RadzenCard>
+    </div>
+
+    <div style="padding: 5px">
+        <RadzenCard Style="width: fit-content; color: black">
+            <h4>Viral Stacks: @viralStacks</h4>
+            <RadzenSlider @bind-Value=@viralStacks TValue="int" Min="0" Max="10" Change=@(args => OnChange(args, "")) />
+        </RadzenCard>
+    </div>
+</div>
+
+<div style="display: flex; flex-direction: row"> 
+    <div style="padding: 5px; alignment: left">@* riven inputs *@
+        <RadzenCard Style="width: fit-content; color: black; display: flex; flex-direction: column">
+            <h4>Riven</h4>
+            <div Style="alignment: right; display: table; table-layout: fixed">
+                    
+                <div Style="display: table-row; horiz-align: center; color:#26b050">
+                    <span style="display: table-cell; vertical-align: middle; padding-bottom: 5px">
+                        <RadzenNumeric Style="vertical-align: middle" TValue="double" Step="0.1" Change=@(args => OnChange(args, "Field1")) />
+                        <RadzenDropDown Style="vertical-align: middle" AllowClear="true" TValue="string" Data=@(Stats.Select(s => s)) Change=@(args => OnChange(args, "Dropdown1")) />
+                    </span>
+                </div>
+                <div Style="display: table-row; horiz-align: center; color:#26b050">
+                    <span style="display: table-cell; vertical-align: middle; padding-bottom: 5px">
+                        <RadzenNumeric Style="vertical-align: middle" TValue="double" Step="0.1" Change=@(args => OnChange(args, "Field2")) />
+                        <RadzenDropDown Style="vertical-align: middle" AllowClear="true" TValue="string" Data=@(Stats.Select(s => s)) Change=@(args => OnChange(args, "Dropdown2")) />
+                    </span>
+                </div>
+                <div Style="display: table-row; horiz-align: center; color:#26b050">
+                    <span style="display: table-cell; vertical-align: middle; padding-bottom: 5px">
+                        <RadzenNumeric Style="vertical-align: middle" TValue="double" Step="0.1" Change=@(args => OnChange(args, "Field3")) />
+                        <RadzenDropDown Style="vertical-align: middle" AllowClear="true" TValue="string" Data=@(Stats.Select(s => s)) Change=@(args => OnChange(args, "Dropdown3")) />
+                    </span>
+                </div>
+                <div Style="display: table-row; horiz-align: center; color:crimson">
+                    <span style="display: table-cell; vertical-align: middle; padding-bottom: 5px">
+                        <RadzenNumeric Style="vertical-align: middle" TValue="double" Step="0.1" Change=@(args => OnChange(args, "Field4")) />
+                        <RadzenDropDown Style="vertical-align: middle" AllowClear="true" TValue="string" Data=@(Stats.Select(s => s)) Change=@(args => OnChange(args, "Dropdown4")) />
+                    </span>
+                </div>
+            </div>
+        </RadzenCard>
+    </div>
+    <div style="padding: 5px; alignment: right; display: flex; flex: 2">@* mod inputs *@
+        <RadzenCard Style="width: fit-content; color: black; display: flex; flex-direction: column">
+            <h4>Mods</h4>
+            <div Style="alignment: right; display: table; table-layout: fixed; padding-bottom: 10px">
+                <div Style="display: table-row; vertical-align: center">
+                    <span style="display: table-cell; vertical-align: middle">
+                        <RadzenCheckBox @bind-Value=@build.hasPPP Name="Primed Pressure Point" TValue="bool" Change=@(args => OnChange(args, "PPP")) />
+                        <RadzenLabel Text="Primed Pressure Point" Style="width: fit-content; height: fit-content"/>
+                    </span>
+                </div>
+                <div Style="display: table-row; vertical-align: center">
+                    <span style="display: table-cell; vertical-align: middle">
+                        <RadzenCheckBox @bind-Value=@build.hasRage Name="Impact" TValue="bool" Change=@(args => OnChange(args, "Rage")) />
+                        <RadzenLabel Text="Arcane Rage" Style="width: fit-content; height: fit-content"/>
+                    </span>
+                </div>
+                <div Style="display: table-row; vertical-align: center">
+                    <span style="display: table-cell; vertical-align: middle">
+                        <RadzenCheckBox @bind-Value=@build.hasAccumulating Name="Accumulating Whipclaw" TValue="bool" Change=@(args => OnChange(args, "Accumulating")) />
+                        <RadzenLabel Text="Accumulating Whipclaw" Style="width: fit-content; height: fit-content"/>
+                    </span>
+                </div>
+                <div Style="display: table-row; vertical-align: center">
+                    <span style="display: table-cell; vertical-align: middle">
+                        <RadzenCheckBox @bind-Value=@build.hasBloodrush Name="Bloodrush" TValue="bool" Change=@(args => OnChange(args, "Bloodrush")) />
+                        <RadzenLabel Text="Bloodrush" Style="width: fit-content; height: fit-content"/>
+                    </span>
+                </div>
+                <div Style="display: table-row; vertical-align: center">
+                    <span style="display: table-cell; vertical-align: middle">
+                        <RadzenCheckBox @bind-Value=@build.hasWeeping Name="Weeping Wounds" TValue="bool" Change=@(args => OnChange(args, "Weeping")) />
+                        <RadzenLabel Text="Weeping Wounds" Style="width: fit-content; height: fit-content"/>
+                    </span>
+                </div>
+                <div Style="display: table-row; vertical-align: center">
+                    <span style="display: table-cell; vertical-align: middle">
+                        <RadzenCheckBox @bind-Value=@build.hasSacSteel Name="Sacrificial Steel" TValue="bool" Change=@(args => OnChange(args, "SacSteel")) />
+                        <RadzenLabel Text="Sacrificial Steel" Style="width: fit-content; height: fit-content"/>
+                    </span>
+                </div>
+                <div Style="display: table-row; vertical-align: center">
+                    <span style="display: table-cell; vertical-align: middle">
+                        <RadzenCheckBox @bind-Value=@build.hasSacPressure Name="Sacrificial Pressure" TValue="bool" Change=@(args => OnChange(args, "SacPressure")) />
+                        <RadzenLabel Text="Sacrificial Pressure" Style="width: fit-content; height: fit-content"/>
+                    </span>
+                </div>
+                <div Style="display: table-row; vertical-align: center">
+                    <span style="display: table-cell; vertical-align: middle">
+                        <RadzenCheckBox @bind-Value=@build.hasGladMight Name="Gladiator Might" TValue="bool" Change=@(args => OnChange(args, "GladMight")) />
+                        <RadzenLabel Text="Gladiator Might" Style="width: fit-content; height: fit-content"/>
+                    </span>
+                </div>
+                <div Style="display: table-row; vertical-align: center">
+                    <span style="display: table-cell; vertical-align: middle">
+                        <RadzenCheckBox @bind-Value=@build.hasOrganShatter Name="Organ Shatter" TValue="bool" Change=@(args => OnChange(args, "OrganShatter")) />
+                        <RadzenLabel Text="Organ Shatter" Style="width: fit-content; height: fit-content"/>
+                    </span>
+                </div>
+                <div Style="display: table-row; vertical-align: center">
+                    <span style="display: table-cell; vertical-align: middle">
+                        <RadzenCheckBox @bind-Value=@build.hasCarnis Name="Carnis Mandible" TValue="bool" Change=@(args => OnChange(args, "Carnis")) />
+                        <RadzenLabel Text="Carnis Mandible" Style="width: fit-content; height: fit-content"/>
+                    </span>
+                </div>
+                <div Style="display: table-row; vertical-align: center">
+                    <span style="display: table-cell; vertical-align: middle">
+                        <RadzenCheckBox @bind-Value=@build.hasDrifting Name="Drifting Contact" TValue="bool" Change=@(args => OnChange(args, "Drifting")) />
+                        <RadzenLabel Text="Drifting Contact" Style="width: fit-content; height: fit-content"/>
+                    </span>
+                </div>
+                <div Style="display: table-row; vertical-align: center">
+                    <span style="display: table-cell; vertical-align: middle">
+                        <RadzenCheckBox @bind-Value=@build.hasProwess Name="Melee Prowess" TValue="bool" Change=@(args => OnChange(args, "Prowess")) />
+                        <RadzenLabel Text="Melee Prowess" Style="width: fit-content; height: fit-content"/>
+                    </span>
+                </div>
+                <div Style="display: table-row; vertical-align: center">
+                    <span style="display: table-cell; vertical-align: middle">
+                        <RadzenCheckBox @bind-Value=@build.hasContempt Name="Niras Contempt" TValue="bool" Change=@(args => OnChange(args, "Contempt")) />
+                        <RadzenLabel Text="Nira's Contempt" Style="width: fit-content; height: fit-content"/>
+                    </span>
+                </div>
+            </div>
+        </RadzenCard>
+    </div>
+</div> 
+
+<div style="display: flex; flex-direction: column; padding: 5px">
+    <RadzenTextArea Rows=@output.Split("\n").Length @bind-Value=@output ReadOnly="true" Style="width: fit-content; height: fit-content" />
+</div>
+
+@code{
+    double str = 40; //assume 40% str
+    int gladMods;
+    double baseDmgMods;
+    double modCD; //.9 = organ shatter, .6 = glad might
+    double accumulatingWhipclaw; 
+    int currentCombo = 12;
+    int viralStacks = 0;
+    double viralMulti;
+    double modImpact;
+    double modPuncture;
+    double modSlash;
+    double modCc;
+    double modSc;
+    double gladset;
+    double bloodrush;
+    double weeping; 
+    string selectedArmor;
+    double modCold;
+    double modElec;
+    double modHeat;
+    double modToxin;
+    double modSD;
+    Field Field1 = new Field(){ Name = "", Value = 0};
+    Field Field2 = new Field(){ Name = "", Value = 0};
+    Field Field3 = new Field(){ Name = "", Value = 0};
+    Field Field4 = new Field(){ Name = "", Value = 0};
+    
+    IEnumerable<string> Stats = new List<string>() 
+    {
+        "Impact",
+        "Puncture",
+        "Slash",
+        "Base Damage",
+        "Crit Chance",
+        "Crit Damage",
+        "Cold",
+        "Electric",
+        "Heat",
+        "Toxin",
+        "Status Chance",
+        "Status Duration"
+    };
+    
+    MeleeRiven rivenStats = new MeleeRiven();
+    Build build = new Build();
+
+    string output = "";
+
+    string[] armorTypes = new[] { "Infested Sinew", "Alloy Armor", "Ferrite Armor" };
+    
+    void OnChange(dynamic value, string name)
+    {
+        rivenStats = new MeleeRiven();
+        if (value != null && name != null)
+        {
+            switch (name)
+            {
+                case "selectArmor":
+                    selectedArmor = value;
+                    break;
+                case "Field1":
+                    Field1.Value = value;
+                    break;
+                case "Field2":
+                    Field2.Value = value;
+                    break;
+                case "Field3":
+                    Field3.Value = value;
+                    break;
+                case "Field4":
+                    Field4.Value = value;
+                    break;
+                case "Dropdown1":
+                    Field1.Name = value;
+                    break;
+                case "Dropdown2":
+                    Field2.Name = value;
+                    break;
+                case "Dropdown3":
+                    Field3.Name = value;
+                    break;
+                case "Dropdown4":
+                    Field4.Name = value;
+                    break;
+                default:
+                    break;
+            }
+            if (!Field1.Name.Equals("") && !Field1.Value.Equals(0))
+            {
+                checkStats(Field1);
+            }
+            if (!Field2.Name.Equals("") && !Field2.Value.Equals(0))
+            {
+                checkStats(Field2);
+            }
+            if (!Field3.Name.Equals("") && !Field3.Value.Equals(0))
+            {
+                checkStats(Field3);
+            }
+            if (!Field4.Name.Equals("") && !Field4.Value.Equals(0))
+            {
+                checkStats(Field4);
+            }
+        }
+        
+        
+        DoMath();
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+    }
+    
+    void OnClick(dynamic args)
+    {
+        DoMath();
+    }
+
+    public void DoMath()
+    {
+        modImpact = 0;
+        modPuncture = 0;
+        modSlash = 0;
+        modCc = 0;
+        modSc = 0;
+        bloodrush = 0;
+        weeping = 0;
+        baseDmgMods = 0;
+        accumulatingWhipclaw = 0;
+        modCold = 0;
+        modElec = 0;
+        modHeat = 0;
+        modToxin = 0;
+        modSD = 0;
+        modCD = 0;
+        
+        
+        if (build.hasPPP)
+        {
+            baseDmgMods += 1.65;
+        }
+        if (build.hasRage)
+        {
+            baseDmgMods += 1.8;
+        }
+        if (build.hasAccumulating)
+        {
+            accumulatingWhipclaw += 3.5;
+        }
+        else
+        {
+            accumulatingWhipclaw += 1;
+        }
+        if (build.hasBloodrush)
+        {
+            bloodrush += 0.4;
+        }
+        if (build.hasWeeping)
+        {
+            weeping += 0.4;
+        }
+        if (build.hasSacSteel)
+        {
+            if (build.hasSacPressure)
+            {
+                modCc += 2.75;
+            }
+            else
+            {
+                modCc += 2.2;
+            }
+        }
+        if (build.hasSacPressure)
+        {
+            if (build.hasSacSteel)
+            {
+                baseDmgMods += 1.375;
+            }
+            else
+            {
+                baseDmgMods += 1.1;
+            }
+        }
+        if (build.hasGladMight)
+        {
+            if (gladMods == 0)
+            {
+                gladMods++;
+            }
+            modCD += 0.6;
+        }
+        if (build.hasOrganShatter)
+        {
+            modCD += 0.9;
+        }
+        if (build.hasCarnis)
+        {
+            modSlash += 0.9;
+            modSc += 0.6;
+        }
+        if (build.hasDrifting)
+        {
+            modSc += 0.4;
+        }
+        if (build.hasProwess)
+        {
+            modSc += 0.9;
+        }
+        if (build.hasContempt)
+        {
+            baseDmgMods += 0.9;
+            modSc += 0.6;
+        }
+        
+
+        ArmorMulti armor = GetSelectedArmorMulti(selectedArmor);
+        
+        
+        if (viralStacks > 0)
+        {
+            viralMulti = 2 + (0.25 * (viralStacks-1));
+        }
+        else
+        {
+            viralMulti = 1;
+        }
+
+        if (rivenStats.usesImpact)
+        {
+            modImpact += rivenStats.Impact / 100;
+        }
+        if (rivenStats.usesPuncture)
+        {
+            modPuncture += rivenStats.Puncture / 100;
+        }
+        if (rivenStats.usesSlash)
+        {
+            modSlash += rivenStats.Slash / 100;
+        }
+        if (rivenStats.usesBase)
+        {
+            baseDmgMods += rivenStats.BaseDmg / 100;
+        }
+        if (rivenStats.usesCC)
+        {
+            modCc += rivenStats.CritChance / 100;
+        }
+        if (rivenStats.usesCD)
+        {
+            modCD += rivenStats.CritDmg / 100;
+        }
+        if (rivenStats.usesCold)
+        {
+            modCold += rivenStats.ColdDmg / 100;
+        }
+        if (rivenStats.usesElec)
+        {
+            modElec += rivenStats.ElectricDmg / 100;
+        }
+        if (rivenStats.usesHeat)
+        {
+            modHeat += rivenStats.HeatDmg / 100;
+        }
+        if (rivenStats.usesTox)
+        {
+            modToxin += rivenStats.ToxinDmg / 100;
+        }
+        if (rivenStats.usesSC)
+        {
+            modSc += rivenStats.StatusChance / 100;
+        }
+        if (rivenStats.usesSD)
+        {
+            modSD += rivenStats.StatusDuration / 100;
+        }
+        
+        Whip whipDmg = new Whip();
+        whipDmg.Impact = whipDmg.baseImpact * (1 + modImpact + baseDmgMods);        
+        whipDmg.Puncture = whipDmg.basePuncture * (1 + modPuncture + baseDmgMods);  
+        whipDmg.Slash = whipDmg.baseSlash * (1 + modSlash + baseDmgMods);           
+        whipDmg.Dmg = whipDmg.Impact + whipDmg.Puncture + whipDmg.Slash;
+        whipDmg.Dmg += (whipDmg.baseImpact + whipDmg.baseSlash + whipDmg.basePuncture) * (modCold + modElec + modHeat + modToxin);
+        
+        gladset = gladMods * 0.1;
+        
+        double overallCc = whipDmg.baseCC * (1 + ((bloodrush + gladset) * (currentCombo-1)) + modCc);
+        double overallSC = whipDmg.baseSC * (1 + (weeping * (currentCombo-1)) + modSc);
+        double overallCd = whipDmg.baseCD * (1 + modCD);
+
+        if (overallCc > 1)
+        {
+            whipDmg.LowCritDmg = whipDmg.Dmg *(1 + overallCd)  * Math.Floor(overallCc / 1) * accumulatingWhipclaw * viralMulti;
+        }
+        
+        
+        
+        output = $"impact: {whipDmg.Impact} \n" +
+                 $"puncture: {whipDmg.Puncture}\n" +
+                 $"slash: {whipDmg.Slash} \n" +
+                 $"basedmg: {whipDmg.Dmg} \n" +
+                 $"overallCC: {overallCc} \n" +
+                 $"basedmgMods: {baseDmgMods} \n" +
+                 $"overallSC: {overallSC}\n" +
+                 $"overallCD: {overallCd}\n" +
+                 $"modcc: {modCc}\n" +
+                 $"lowcritdmg: {whipDmg.LowCritDmg}";
+
+
+    }
+
+    ArmorMulti GetSelectedArmorMulti(string selectedArmor)
+    {
+        ArmorMulti armor;
+        switch (selectedArmor)
+        {
+            case "Infested Sinew":
+                armor = new ArmorMulti()
+                {
+                    Impact = 0,
+                    Puncture = 0.25,
+                    Slash = 0,
+                    Cold = 0.25,
+                    Electric = 0,
+                    Heat = 0,
+                    Toxin = 0,
+                    Blast = -0.5,
+                    Corrosive = 0,
+                    Gas = 0,
+                    Magnetic = 0,
+                    Radiation = 0.5,
+                    Viral = 0
+                };
+                break;
+            case "Alloy Armor":
+                armor = new ArmorMulti()
+                {
+                    Impact = 0,
+                    Puncture = 0.15,
+                    Slash = -0.5,
+                    Cold = 0.25,
+                    Electric = -0.5,
+                    Heat = 0,
+                    Toxin = 0,
+                    Blast = 0,
+                    Corrosive = 0,
+                    Gas = 0,
+                    Magnetic = -0.5,
+                    Radiation = 0.75,
+                    Viral = 0
+                };
+                break;
+            case "Ferrite Armor":
+                armor = new ArmorMulti()
+                {
+                    Impact = 0,
+                    Puncture = 0.5,
+                    Slash = -0.15,
+                    Cold = 0,
+                    Electric = 0,
+                    Heat = 0,
+                    Toxin = -0.25,
+                    Blast = 0.75,
+                    Corrosive = 0,
+                    Gas = 0,
+                    Magnetic = 0,
+                    Radiation = 0,
+                    Viral = 0
+                };
+                break;
+            default:
+                armor = new ArmorMulti()
+                {
+                    Impact = 0,
+                    Puncture = 0,
+                    Slash = 0,
+                    Cold = 0,
+                    Electric = 0,
+                    Heat = 0,
+                    Toxin = 0,
+                    Blast = 0,
+                    Corrosive = 0,
+                    Gas = 0,
+                    Magnetic = 0,
+                    Radiation = 0,
+                    Viral = 0
+                };
+                break;
+        }
+        return armor;
+    }
+    
+    public void checkStats(Field currentField)
+    {
+        switch (currentField.Name)
+        {
+            case "Impact":
+                rivenStats.Impact = currentField.Value;
+                rivenStats.usesImpact = true;
+                break;
+            case "Puncture":
+                rivenStats.Puncture = currentField.Value;
+                rivenStats.usesPuncture = true;
+                break;
+            case "Slash":
+                rivenStats.Slash = currentField.Value;
+                rivenStats.usesSlash = true;
+                break;
+            case "Base Damage":
+                rivenStats.BaseDmg = currentField.Value;
+                rivenStats.usesBase = true;
+                break;
+            case "Crit Chance":
+                rivenStats.CritChance = currentField.Value;
+                rivenStats.usesCC = true;
+                break;
+            case "Crit Damage":
+                rivenStats.CritDmg = currentField.Value;
+                rivenStats.usesCD = true;
+                break;
+            case "Cold":
+                rivenStats.ColdDmg = currentField.Value;
+                rivenStats.usesCold = true;
+                break;
+            case "Electric":
+                rivenStats.ElectricDmg = currentField.Value;
+                rivenStats.usesElec = true;
+                break;
+            case "Heat":
+                rivenStats.HeatDmg = currentField.Value;
+                rivenStats.usesHeat = true;
+                break;
+            case "Toxin":
+                rivenStats.ToxinDmg = currentField.Value;
+                rivenStats.usesTox = true;
+                break;
+            case "Status Chance":
+                rivenStats.StatusChance = currentField.Value;
+                rivenStats.usesSC = true;
+                break;
+            case "Status Duration":
+                rivenStats.StatusDuration = currentField.Value;
+                rivenStats.usesSD = true;
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    public class Field
+    {
+        public string Name { get; set; }
+        public double Value { get; set; }
+    }
+    
+    public class Whip
+    {
+        public double Impact { get; set; }
+        public double Puncture { get; set; }
+        public double Slash { get; set; }
+        public double Dmg { get; set; }
+        public double HighCritDmg { get; set; }
+        public double LowCritDmg { get; set; }
+        public double baseImpact = 100;
+        public double basePuncture = 100;
+        public double baseSlash = 100;
+        public double baseCD = 2.0;
+        public double baseCC = 0.25;
+        public double baseSC = 0.2;
+    }
+
+    public class MeleeRiven
+    {
+        public double Impact { get; set; } 
+        public bool usesImpact { get; set; }
+        public double Puncture { get; set; }
+        public bool usesPuncture { get; set; }
+        public double Slash { get; set; }
+        public bool usesSlash { get; set; }
+        public double BaseDmg { get; set; }
+        public bool usesBase { get; set; }
+        public double CritChance { get; set; }
+        public bool usesCC { get; set; }
+        public double CritDmg { get; set; }
+        public bool usesCD { get; set; }
+        public double ColdDmg { get; set; }
+        public bool usesCold { get; set; }
+        public double ElectricDmg { get; set; }
+        public bool usesElec { get; set; }
+        public double HeatDmg { get; set; }
+        public bool usesHeat { get; set; }
+        public double ToxinDmg { get; set; }
+        public bool usesTox { get; set; }
+        public double StatusChance { get; set; }
+        public bool usesSC { get; set; }
+        public double StatusDuration { get; set; }
+        public bool usesSD { get; set; }
+    }
+
+    public class Build
+    {
+        public bool hasPPP { get; set; }
+        public bool hasRage { get; set; }
+        public bool hasAccumulating { get; set; }
+        public bool hasBloodrush { get; set; }
+        public bool hasWeeping { get; set; }
+        public bool hasSacSteel { get; set; }
+        public bool hasSacPressure { get; set; }
+        public bool hasGladMight { get; set; }
+        public bool hasOrganShatter { get; set; }
+        public bool hasCarnis { get; set; }
+        public bool hasDrifting { get; set; }
+        public bool hasProwess { get; set; }
+        public bool hasContempt { get; set; }
+    }
+
+    public class ArmorMulti
+    {
+        public double Impact { get; set; }
+        public double Puncture { get; set; }
+        public double Slash { get; set; }
+        public double Cold { get; set; }
+        public double Electric { get; set; }
+        public double Heat { get; set; }
+        public double Toxin { get; set; }
+        public double Blast { get; set; }
+        public double Corrosive { get; set; }
+        public double Gas { get; set; }
+        public double Magnetic { get; set; }
+        public double Radiation { get; set; }
+        public double Viral { get; set; }
+    }
+}
