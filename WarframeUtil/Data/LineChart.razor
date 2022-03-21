@@ -49,7 +49,10 @@
                 UnrolledAvg = unrolledAvgs[i].price
             });
         }
-        Avg = AvgTemp.ToArray();
+        
+        
+        
+        Avg = AvgTemp.Where(i => i.ItemDate.Subtract(DateTime.Now) < TimeSpan.FromDays(10)).ToArray();
     }
     
     class DataItem

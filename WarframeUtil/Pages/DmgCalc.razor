@@ -8,10 +8,6 @@
 <PageTitle>DmgCalc</PageTitle>
 <h2>DmgCalc</h2>
 
-<div style="display: flex; flex-direction: row; padding: 5px">
-    <RadzenButton Text="Calculate" Icon="grid_on" Style="background: #26b050" Click=@(args => OnClick(args)) />
-</div>
-
 
 <div style="display: flex; flex-direction: row">
     <div style="padding: 5px">
@@ -34,22 +30,22 @@
 <div style="display: flex; flex-direction: row">
     <div style="padding: 5px">
         <RadzenCard Style="width: fit-content; color: black">
-            <h4>Gladiator mod count: @gladMods</h4>
-            <RadzenSlider TValue="int" @bind-Value=@gladMods Min="0" Max="6" Change=@(args => OnChange(args, "")) />
+            <h4>Gladiator mod count: @_gladMods</h4>
+            <RadzenSlider TValue="int" @bind-Value=@_gladMods Min="0" Max="6" Change=@(args => OnChange(args, "")) />
         </RadzenCard>
     </div>
     
     <div style="padding: 5px">
         <RadzenCard Style="width: fit-content; color: black">
-            <h4>Combo: @currentCombo</h4>
-            <RadzenSlider TValue="int" @bind-Value=@currentCombo Min="1" Max="13" Change=@(args => OnChange(args, "")) />
+            <h4>Combo: @_currentCombo</h4>
+            <RadzenSlider TValue="int" @bind-Value=@_currentCombo Min="1" Max="13" Change=@(args => OnChange(args, "")) />
         </RadzenCard>
     </div>
 
     <div style="padding: 5px">
         <RadzenCard Style="width: fit-content; color: black">
-            <h4>Viral Stacks: @viralStacks</h4>
-            <RadzenSlider @bind-Value=@viralStacks TValue="int" Min="0" Max="10" Change=@(args => OnChange(args, "")) />
+            <h4>Viral Stacks: @_viralStacks</h4>
+            <RadzenSlider @bind-Value=@_viralStacks TValue="int" Min="0" Max="10" Change=@(args => OnChange(args, "")) />
         </RadzenCard>
     </div>
 </div>
@@ -180,27 +176,27 @@
 
 @code{
     double str = 40; //assume 40% str
-    int gladMods;
-    double baseDmgMods;
-    double modCD; //.9 = organ shatter, .6 = glad might
-    double accumulatingWhipclaw; 
-    int currentCombo = 12;
-    int viralStacks = 0;
-    double viralMulti;
-    double modImpact;
-    double modPuncture;
-    double modSlash;
-    double modCc;
-    double modSc;
-    double gladset;
-    double bloodrush;
-    double weeping; 
-    string selectedArmor;
-    double modCold;
-    double modElec;
-    double modHeat;
-    double modToxin;
-    double modSD;
+    int _gladMods;
+    double _baseDmgMods;
+    double _modCd; //.9 = organ shatter, .6 = glad might
+    double _accumulatingWhipclaw; 
+    int _currentCombo = 12;
+    int _viralStacks = 0;
+    double _viralMulti;
+    double _modImpact;
+    double _modPuncture;
+    double _modSlash;
+    double _modCc;
+    double _modSc;
+    double _gladset;
+    double _bloodrush;
+    double _weeping; 
+    string? _selectedArmor;
+    double _modCold;
+    double _modElec;
+    double _modHeat;
+    double _modToxin;
+    double _modSd;
     Field Field1 = new Field(){ Name = "", Value = 0};
     Field Field2 = new Field(){ Name = "", Value = 0};
     Field Field3 = new Field(){ Name = "", Value = 0};
@@ -237,7 +233,7 @@
             switch (name)
             {
                 case "selectArmor":
-                    selectedArmor = value;
+                    _selectedArmor = value;
                     break;
                 case "Field1":
                     Field1.Value = value;
@@ -299,178 +295,178 @@
 
     public void DoMath()
     {
-        modImpact = 0;
-        modPuncture = 0;
-        modSlash = 0;
-        modCc = 0;
-        modSc = 0;
-        bloodrush = 0;
-        weeping = 0;
-        baseDmgMods = 0;
-        accumulatingWhipclaw = 0;
-        modCold = 0;
-        modElec = 0;
-        modHeat = 0;
-        modToxin = 0;
-        modSD = 0;
-        modCD = 0;
+        _modImpact = 0;
+        _modPuncture = 0;
+        _modSlash = 0;
+        _modCc = 0;
+        _modSc = 0;
+        _bloodrush = 0;
+        _weeping = 0;
+        _baseDmgMods = 0;
+        _accumulatingWhipclaw = 0;
+        _modCold = 0;
+        _modElec = 0;
+        _modHeat = 0;
+        _modToxin = 0;
+        _modSd = 0;
+        _modCd = 0;
         
         
         if (build.hasPPP)
         {
-            baseDmgMods += 1.65;
+            _baseDmgMods += 1.65;
         }
         if (build.hasRage)
         {
-            baseDmgMods += 1.8;
+            _baseDmgMods += 1.8;
         }
         if (build.hasAccumulating)
         {
-            accumulatingWhipclaw += 3.5;
+            _accumulatingWhipclaw += 3.5;
         }
         else
         {
-            accumulatingWhipclaw += 1;
+            _accumulatingWhipclaw += 1;
         }
         if (build.hasBloodrush)
         {
-            bloodrush += 0.4;
+            _bloodrush += 0.4;
         }
         if (build.hasWeeping)
         {
-            weeping += 0.4;
+            _weeping += 0.4;
         }
         if (build.hasSacSteel)
         {
             if (build.hasSacPressure)
             {
-                modCc += 2.75;
+                _modCc += 2.75;
             }
             else
             {
-                modCc += 2.2;
+                _modCc += 2.2;
             }
         }
         if (build.hasSacPressure)
         {
             if (build.hasSacSteel)
             {
-                baseDmgMods += 1.375;
+                _baseDmgMods += 1.375;
             }
             else
             {
-                baseDmgMods += 1.1;
+                _baseDmgMods += 1.1;
             }
         }
         if (build.hasGladMight)
         {
-            if (gladMods == 0)
+            if (_gladMods == 0)
             {
-                gladMods++;
+                _gladMods++;
             }
-            modCD += 0.6;
+            _modCd += 0.6;
         }
         if (build.hasOrganShatter)
         {
-            modCD += 0.9;
+            _modCd += 0.9;
         }
         if (build.hasCarnis)
         {
-            modSlash += 0.9;
-            modSc += 0.6;
+            _modSlash += 0.9;
+            _modSc += 0.6;
         }
         if (build.hasDrifting)
         {
-            modSc += 0.4;
+            _modSc += 0.4;
         }
         if (build.hasProwess)
         {
-            modSc += 0.9;
+            _modSc += 0.9;
         }
         if (build.hasContempt)
         {
-            baseDmgMods += 0.9;
-            modSc += 0.6;
+            _baseDmgMods += 0.9;
+            _modSc += 0.6;
         }
         
 
-        ArmorMulti armor = GetSelectedArmorMulti(selectedArmor);
+        ArmorMulti armor = GetSelectedArmorMulti(_selectedArmor);
         
         
-        if (viralStacks > 0)
+        if (_viralStacks > 0)
         {
-            viralMulti = 2 + (0.25 * (viralStacks-1));
+            _viralMulti = 2 + (0.25 * (_viralStacks-1));
         }
         else
         {
-            viralMulti = 1;
+            _viralMulti = 1;
         }
 
         if (rivenStats.usesImpact)
         {
-            modImpact += rivenStats.Impact / 100;
+            _modImpact += rivenStats.Impact / 100;
         }
         if (rivenStats.usesPuncture)
         {
-            modPuncture += rivenStats.Puncture / 100;
+            _modPuncture += rivenStats.Puncture / 100;
         }
         if (rivenStats.usesSlash)
         {
-            modSlash += rivenStats.Slash / 100;
+            _modSlash += rivenStats.Slash / 100;
         }
         if (rivenStats.usesBase)
         {
-            baseDmgMods += rivenStats.BaseDmg / 100;
+            _baseDmgMods += rivenStats.BaseDmg / 100;
         }
         if (rivenStats.usesCC)
         {
-            modCc += rivenStats.CritChance / 100;
+            _modCc += rivenStats.CritChance / 100;
         }
         if (rivenStats.usesCD)
         {
-            modCD += rivenStats.CritDmg / 100;
+            _modCd += rivenStats.CritDmg / 100;
         }
         if (rivenStats.usesCold)
         {
-            modCold += rivenStats.ColdDmg / 100;
+            _modCold += rivenStats.ColdDmg / 100;
         }
         if (rivenStats.usesElec)
         {
-            modElec += rivenStats.ElectricDmg / 100;
+            _modElec += rivenStats.ElectricDmg / 100;
         }
         if (rivenStats.usesHeat)
         {
-            modHeat += rivenStats.HeatDmg / 100;
+            _modHeat += rivenStats.HeatDmg / 100;
         }
         if (rivenStats.usesTox)
         {
-            modToxin += rivenStats.ToxinDmg / 100;
+            _modToxin += rivenStats.ToxinDmg / 100;
         }
         if (rivenStats.usesSC)
         {
-            modSc += rivenStats.StatusChance / 100;
+            _modSc += rivenStats.StatusChance / 100;
         }
         if (rivenStats.usesSD)
         {
-            modSD += rivenStats.StatusDuration / 100;
+            _modSd += rivenStats.StatusDuration / 100;
         }
         
         Whip whipDmg = new Whip();
-        whipDmg.Impact = whipDmg.baseImpact * (1 + modImpact + baseDmgMods);        
-        whipDmg.Puncture = whipDmg.basePuncture * (1 + modPuncture + baseDmgMods);  
-        whipDmg.Slash = whipDmg.baseSlash * (1 + modSlash + baseDmgMods);           
+        whipDmg.Impact = whipDmg.baseImpact * (1 + _modImpact + _baseDmgMods);        
+        whipDmg.Puncture = whipDmg.basePuncture * (1 + _modPuncture + _baseDmgMods);  
+        whipDmg.Slash = whipDmg.baseSlash * (1 + _modSlash + _baseDmgMods);           
         whipDmg.Dmg = whipDmg.Impact + whipDmg.Puncture + whipDmg.Slash;
-        whipDmg.Dmg += (whipDmg.baseImpact + whipDmg.baseSlash + whipDmg.basePuncture) * (modCold + modElec + modHeat + modToxin);
+        whipDmg.Dmg += (whipDmg.baseImpact + whipDmg.baseSlash + whipDmg.basePuncture) * (_modCold + _modElec + _modHeat + _modToxin);
         
-        gladset = gladMods * 0.1;
+        _gladset = _gladMods * 0.1;
         
-        double overallCc = whipDmg.baseCC * (1 + ((bloodrush + gladset) * (currentCombo-1)) + modCc);
-        double overallSC = whipDmg.baseSC * (1 + (weeping * (currentCombo-1)) + modSc);
-        double overallCd = whipDmg.baseCD * (1 + modCD);
+        double overallCc = whipDmg.baseCC * (1 + ((_bloodrush + _gladset) * (_currentCombo-1)) + _modCc);
+        double overallSC = whipDmg.baseSC * (1 + (_weeping * (_currentCombo-1)) + _modSc);
+        double overallCd = whipDmg.baseCD * (1 + _modCd);
 
         if (overallCc > 1)
         {
-            whipDmg.LowCritDmg = whipDmg.Dmg *(1 + overallCd)  * Math.Floor(overallCc / 1) * accumulatingWhipclaw * viralMulti;
+            whipDmg.LowCritDmg = whipDmg.Dmg *(1 + overallCd)  * Math.Floor(overallCc / 1) * _accumulatingWhipclaw * _viralMulti;
         }
         
         
@@ -480,10 +476,10 @@
                  $"slash: {whipDmg.Slash} \n" +
                  $"basedmg: {whipDmg.Dmg} \n" +
                  $"overallCC: {overallCc} \n" +
-                 $"basedmgMods: {baseDmgMods} \n" +
+                 $"basedmgMods: {_baseDmgMods} \n" +
                  $"overallSC: {overallSC}\n" +
                  $"overallCD: {overallCd}\n" +
-                 $"modcc: {modCc}\n" +
+                 $"modcc: {_modCc}\n" +
                  $"lowcritdmg: {whipDmg.LowCritDmg}";
 
 
